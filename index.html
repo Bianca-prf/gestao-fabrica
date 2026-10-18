@@ -669,7 +669,7 @@
         }
 
         .kpi-card { 
-            background: var(--bg-card); 
+            background: var(--bg-card); /* Fundo sempre adaptável (claro/escuro) */
             padding: 20px; 
             border-radius: 8px; 
             border-left: 4px solid var(--prf-blue); 
@@ -697,10 +697,11 @@
             margin-left: 5px; 
         }
         
+        /* Formatação do Valor Grande (Para as Horas nas Categorias) */
         .kpi-value-highlight {
             font-size: 20px;
             font-weight: bold;
-            color: var(--text-main); 
+            color: var(--text-main); /* Adaptável claro/escuro para sempre se ler */
             margin-top: 5px;
             padding-top: 5px;
             border-top: 1px dashed rgba(128,128,128,0.3);
@@ -927,7 +928,7 @@
             <input type="text" id="new-ref" placeholder="Nome/Referência" style="width: 160px;">
             <input type="number" id="new-kg" placeholder="Kg" step="any" style="width: 70px;">
             <input type="number" id="new-pol" placeholder="Pol ('')" step="any" style="width: 70px;">
-            <input type="number" id="new-horas" placeholder="Horas" step="any" style="width: 70px;">
+            <input type="number" id="new-horas" placeholder="Horas (Ex: 1.30)" step="any" style="width: 100px;">
             <input type="text" id="new-material" placeholder="Material (Ex: Inox)" style="width: 120px;">
             <select id="new-prio">
                 <option value="Sem Cor">⚪ Sem Categoria (Branco)</option>
@@ -1388,42 +1389,42 @@
                 <div class="kpi-title" style="color: #ef5350;">Prioridade Máxima (Vermelho)</div>
                 <div class="kpi-value" id="kpi-max-unid">0 Unid</div>
                 <div style="font-size: 13px; color: var(--text-secondary); margin-top: 4px;" id="kpi-max-detalhes">⚖️ 0.0 Kg | 📏 0.0"</div>
-                <div class="kpi-value-highlight" id="kpi-max-horas">⏱️ 0.0 Horas</div>
+                <div class="kpi-value-highlight" id="kpi-max-horas">⏱️ 0h00</div>
             </div>
             <!-- Requisições Internas (Laranja) -->
             <div class="kpi-card" style="border-left-color: #ff9800;">
                 <div class="kpi-title" style="color: #ff9800;">Requisições Internas (Laranja)</div>
                 <div class="kpi-value" id="kpi-req-interna">0 Unid</div>
                 <div style="font-size: 13px; color: var(--text-secondary); margin-top: 4px;" id="kpi-req-interna-detalhes">⚖️ 0.0 Kg | 📏 0.0"</div>
-                <div class="kpi-value-highlight" id="kpi-req-interna-horas">⏱️ 0.0 Horas</div>
+                <div class="kpi-value-highlight" id="kpi-req-interna-horas">⏱️ 0h00</div>
             </div>
             <!-- Pintura Externa (Amarelo) -->
             <div class="kpi-card" style="border-left-color: #fbc02d;">
                 <div class="kpi-title" style="color: #fbc02d;">Pintura Externa (Amarelo)</div>
                 <div class="kpi-value" id="kpi-pintura-unid">0 Unid</div>
                 <div style="font-size: 13px; color: var(--text-secondary); margin-top: 4px;" id="kpi-pintura-detalhes">⚖️ 0.0 Kg | 📏 0.0"</div>
-                <div class="kpi-value-highlight" id="kpi-pintura-horas">⏱️ 0.0 Horas</div>
+                <div class="kpi-value-highlight" id="kpi-pintura-horas">⏱️ 0h00</div>
             </div>
             <!-- Normal -->
             <div class="kpi-card" style="border-left-color: #cbd5e1;">
                 <div class="kpi-title" style="color: #64748b;">Normal (Sem Destaque)</div>
                 <div class="kpi-value" id="kpi-normal-unid">0 Unid</div>
                 <div style="font-size: 13px; color: var(--text-secondary); margin-top: 4px;" id="kpi-normal-detalhes">⚖️ 0.0 Kg | 📏 0.0"</div>
-                <div class="kpi-value-highlight" id="kpi-normal-horas">⏱️ 0.0 Horas</div>
+                <div class="kpi-value-highlight" id="kpi-normal-horas">⏱️ 0h00</div>
             </div>
             <!-- Raio X -->
             <div class="kpi-card" style="border-left-color: #9c27b0;">
                 <div class="kpi-title" style="color: #9c27b0;">Raio X (Roxo)</div>
                 <div class="kpi-value" id="kpi-raiox-unid">0 Unid</div>
                 <div style="font-size: 13px; color: var(--text-secondary); margin-top: 4px;" id="kpi-raiox-detalhes">⚖️ 0.0 Kg | 📏 0.0"</div>
-                <div class="kpi-value-highlight" id="kpi-raiox-horas">⏱️ 0.0 Horas</div>
+                <div class="kpi-value-highlight" id="kpi-raiox-horas">⏱️ 0h00</div>
             </div>
             <!-- Retrabalho -->
             <div class="kpi-card" style="border-left-color: #94a3b8;">
                 <div class="kpi-title" style="color: #94a3b8;">Retrabalho (Cinzento)</div>
                 <div class="kpi-value" id="kpi-retrabalho-unid">0 Unid</div>
                 <div style="font-size: 13px; color: var(--text-secondary); margin-top: 4px;" id="kpi-retrabalho-detalhes">⚖️ 0.0 Kg | 📏 0.0"</div>
-                <div class="kpi-value-highlight" id="kpi-retrabalho-horas">⏱️ 0.0 Horas</div>
+                <div class="kpi-value-highlight" id="kpi-retrabalho-horas">⏱️ 0h00</div>
             </div>
         </div>
 
@@ -1545,7 +1546,7 @@
                     <input type="number" id="edit-pol" step="any" style="width:100%;">
                 </div>
                 <div style="flex:1;">
-                    <label>Horas:</label>
+                    <label>Horas (Ex: 1.30):</label>
                     <input type="number" id="edit-horas" step="any" style="width:100%;">
                 </div>
                 <div style="flex:1;">
@@ -1608,7 +1609,7 @@
                         <div><b>Prioridade:</b> <span id="details-prio">Normal</span></div>
                         <div><b>Peso:</b> <span id="details-kg">0</span> Kg</div>
                         <div><b>Tamanho:</b> <span id="details-pol">0</span>"</div>
-                        <div><b>Tempo Execução:</b> <span id="details-horas">0</span>h</div>
+                        <div><b>Tempo Execução:</b> <span id="details-horas">0h00</span></div>
                         <div><b>Material:</b> <span id="details-material">N/A</span></div>
                     </div>
                 </div>
@@ -1650,7 +1651,7 @@
 
     <script>
         // =====================================================
-        // FUNÇÕES DE SEGURANÇA E FORMATAÇÃO
+        // FUNÇÕES DE SEGURANÇA E MATEMÁTICA DE TEMPO
         // =====================================================
         
         function sanitizeForDB(str) {
@@ -1684,6 +1685,29 @@
             const partes = datePart.split('-');
             if (partes.length === 3) return `${partes[2]}/${partes[1]}/${partes[0]}`;
             return dataStr;
+        }
+
+        // MOTOR DE CONVERSÃO DE TEMPO (HH.MM -> Minutos -> Formato Limpo)
+        function parseHorasParaMinutos(val) {
+            if (!val) return 0;
+            const strVal = String(val).replace(',', '.');
+            const parts = strVal.split('.');
+            let h = parseInt(parts[0], 10) || 0;
+            let m = 0;
+            if (parts.length > 1) {
+                let mStr = parts[1];
+                if (mStr.length === 1) mStr += '0'; 
+                else if (mStr.length > 2) mStr = mStr.substring(0, 2);
+                m = parseInt(mStr, 10) || 0;
+            }
+            return (h * 60) + m;
+        }
+
+        function formatarMinutosParaHoras(totalMins) {
+            if (!totalMins || totalMins === 0) return '0h00';
+            const h = Math.floor(totalMins / 60);
+            const m = Math.round(totalMins % 60);
+            return `${h}h${m < 10 ? '0' : ''}${m}`;
         }
 
         // =====================================================
@@ -1986,7 +2010,9 @@
             const dadosExcel = todasAsObras.map(o => {
                 const pesoFinal = parseFloat(String(o.kg !== undefined && o.kg !== null ? o.kg : (o.toneladas || 0)).replace(',', '.')) || 0;
                 const polFinal = parseFloat(String(o.polegadas || '0').replace(',', '.')) || 0;
-                const horasFinal = parseFloat(String(o.horas || '0').replace(',', '.')) || 0;
+                
+                // Gravar horas bonitinhas no Excel
+                const horasFinalStr = formatarMinutosParaHoras(parseHorasParaMinutos(o.horas));
                 
                 return {
                     "Código Obra": o.obra_ref || "MANUAL", 
@@ -1996,7 +2022,7 @@
                     "Trabalhador": o.trabalhador,
                     "Peso (Kg)": pesoFinal, 
                     "Polegadas": polFinal, 
-                    "Horas Execução": horasFinal,
+                    "Horas Execução": horasFinalStr,
                     "Prioridade": o.prioridade || 'Normal', 
                     "Material": o.material || '',
                     "Comentários": o.comentarios || '',
@@ -2172,7 +2198,7 @@
                 kg: vKg, 
                 toneladas: vKg, 
                 polegadas: vPol, 
-                horas: vHoras,
+                horas: vHoras, // Guardamos o RAW decimal (ex: 1.30)
                 prioridade: sanitizeForDB(prio), 
                 fase: 'Projeto', 
                 trabalhador: 'Não Atribuído',
@@ -2284,7 +2310,10 @@
 
                                 const vKg = colKg !== -1 ? (parseFloat(String(row[colKg] || '0').replace(',', '.')) || 0) : 0;
                                 const vPol = colPol !== -1 ? (parseFloat(String(row[colPol] || '0').replace(',', '.')) || 0) : 0;
-                                const vHoras = colHoras !== -1 ? (parseFloat(String(row[colHoras] || '0').replace(',', '.')) || 0) : 0;
+                                
+                                // O Excel as vezes exporta 1h30, vamos limpar para número se necessário
+                                let numHoras = String(row[colHoras] || '0').toLowerCase().replace('h', '.').replace('m', '').trim();
+                                const vHoras = parseFloat(numHoras.replace(',', '.')) || 0;
                                 
                                 const dataExcel = colData !== -1 ? String(row[colData] || '') : '';
                                 const rastreioExcel = colRastreio !== -1 ? String(row[colRastreio] || '') : '';
@@ -2659,7 +2688,10 @@
                     
                     const vKg = parseFloat(String(c.kg !== undefined && c.kg !== null ? c.kg : (c.toneladas || 0)).replace(',', '.')) || 0; 
                     const vPol = parseFloat(String(c.polegadas || '0').replace(',', '.')) || 0;
-                    const vHoras = parseFloat(String(c.horas || '0').replace(',', '.')) || 0;
+                    
+                    // Conversão Limpa para apresentar no cartão
+                    const minTotais = parseHorasParaMinutos(c.horas);
+                    const strHorasDisplay = formatarMinutosParaHoras(minTotais);
                     
                     let workerDisplay = c.rastreio ? escapeHTML(c.rastreio) : safeTrab;
                     let removeBtnHtml = '';
@@ -2685,7 +2717,7 @@
                         <div class="card-ref">${safeRef || 'Sem Referência'}</div>
                         
                         <div class="card-info" style="margin-top:4px;">
-                            <div style="margin-bottom: 3px;">⚖️ ${Number(vKg.toFixed(2))} Kg | 📏 ${Number(vPol.toFixed(2))}" | ⏱️ ${Number(vHoras.toFixed(2))}h</div>
+                            <div style="margin-bottom: 3px;">⚖️ ${Number(vKg.toFixed(2))} Kg | 📏 ${Number(vPol.toFixed(2))}" | ⏱️ ${strHorasDisplay}</div>
                             <div style="display:flex; justify-content:space-between; align-items:flex-start; background:rgba(0,0,0,0.04); padding:3px; border-radius:4px;">
                                 <span style="font-weight:bold; color:var(--prf-blue-dark); word-break:break-word; line-height:1.4;">
                                     👷 ${workerDisplay}
@@ -2704,7 +2736,7 @@
 
                     if (currentUserRole !== 'Visualizador') {
                         el.querySelector('.btn-editar').addEventListener('click', () => {
-                            abrirModalEdicao(c.id, c.obra_ref, c.referencia, vKg, vPol, vHoras, c.prioridade, c.comentarios, c.data_criacao, c.rastreio, t, c.material);
+                            abrirModalEdicao(c.id, c.obra_ref, c.referencia, vKg, vPol, c.horas, c.prioridade, c.comentarios, c.data_criacao, c.rastreio, t, c.material);
                         });
                         el.querySelector('.btn-apagar').addEventListener('click', () => apagarCartao(c.id));
                         
@@ -2745,7 +2777,10 @@
                     
                     const vKg = parseFloat(String(c.kg !== undefined && c.kg !== null ? c.kg : (c.toneladas || 0)).replace(',', '.')) || 0; 
                     const vPol = parseFloat(String(c.polegadas || '0').replace(',', '.')) || 0;
-                    const vHoras = parseFloat(String(c.horas || '0').replace(',', '.')) || 0;
+                    
+                    // Conversão Limpa
+                    const minTotais = parseHorasParaMinutos(c.horas);
+                    const strHorasDisplay = formatarMinutosParaHoras(minTotais);
                     
                     let btnEditar = '';
                     if (currentUserRole !== 'Visualizador') {
@@ -2756,7 +2791,7 @@
                         ${bdg}
                         <div class="card-ref">${safeRef || 'Sem Referência'}</div>
                         <div class="card-info" style="margin-top:4px;">
-                            <div style="margin-bottom: 3px;">⚖️ ${Number(vKg.toFixed(2))} Kg | 📏 ${Number(vPol.toFixed(2))}" | ⏱️ ${Number(vHoras.toFixed(2))}h</div>
+                            <div style="margin-bottom: 3px;">⚖️ ${Number(vKg.toFixed(2))} Kg | 📏 ${Number(vPol.toFixed(2))}" | ⏱️ ${strHorasDisplay}</div>
                             <div style="background:rgba(0,0,0,0.04); padding:3px; border-radius:4px; font-weight:bold; color: #ef5350;">
                                 ⚙️ Mat: ${safeMat}
                             </div>
@@ -2771,7 +2806,7 @@
 
                     if (currentUserRole !== 'Visualizador') {
                         el.querySelector('.btn-editar').addEventListener('click', () => {
-                            abrirModalEdicao(c.id, c.obra_ref, c.referencia, vKg, vPol, vHoras, c.prioridade, c.comentarios, c.data_criacao, c.rastreio, c.trabalhador, c.material);
+                            abrirModalEdicao(c.id, c.obra_ref, c.referencia, vKg, vPol, c.horas, c.prioridade, c.comentarios, c.data_criacao, c.rastreio, c.trabalhador, c.material);
                         });
                         el.addEventListener('dragstart', e => e.dataTransfer.setData('text/plain', c.id));
                     }
@@ -2796,8 +2831,9 @@
             const vPol = parseFloat(String(c.polegadas || '0').replace(',', '.')) || 0;
             document.getElementById('details-pol').innerText = Number(vPol.toFixed(2));
             
-            const vHoras = parseFloat(String(c.horas || '0').replace(',', '.')) || 0;
-            document.getElementById('details-horas').innerText = Number(vHoras.toFixed(2));
+            // Apresentar horas limpas no pop-up
+            const minTotais = parseHorasParaMinutos(c.horas);
+            document.getElementById('details-horas').innerText = formatarMinutosParaHoras(minTotais);
             
             document.getElementById('details-material').innerText = c.material || 'N/A';
 
@@ -2841,7 +2877,10 @@
             document.getElementById('edit-ref').value = ref || '';
             document.getElementById('edit-kg').value = kg || 0; 
             document.getElementById('edit-pol').value = pol || 0;
-            document.getElementById('edit-horas').value = horas || 0;
+            
+            // O formulário de edição mostra sempre o valor original "bruto" que a pessoa escreveu
+            document.getElementById('edit-horas').value = horas || ''; 
+            
             document.getElementById('edit-prio').value = prio || 'Normal'; 
             document.getElementById('edit-comments').value = comentarios || '';
             document.getElementById('edit-material').value = material || '';
@@ -2881,6 +2920,8 @@
             const id = document.getElementById('edit-id').value;
             const vKg = parseNumeroSeguro('edit-kg');
             const vPol = parseNumeroSeguro('edit-pol');
+            
+            // Guarda o valor escrito tal e qual, as contas são feitas por cima
             const vHoras = parseNumeroSeguro('edit-horas');
 
             let oldRastreio = document.getElementById('edit-rastreio-current').value.trim();
@@ -2949,9 +2990,9 @@
             let unidMaxima = 0; let unidLaranja = 0; let unidAmarelo = 0; 
             let unidNormal = 0; let unidRaiox = 0; let unidRetrabalhoCat = 0;
             
-            // Contadores de Horas por Categoria
-            let horasMaxima = 0; let horasLaranja = 0; let horasAmarelo = 0; 
-            let horasNormal = 0; let horasRaiox = 0; let horasRetrabalhoCat = 0;
+            // Contadores de Horas (AGORA SOMA MINUTOS TOTAIS PARA PRECISÃO)
+            let minsMaxima = 0; let minsLaranja = 0; let minsAmarelo = 0; 
+            let minsNormal = 0; let minsRaiox = 0; let minsRetrabalhoCat = 0;
 
             // Contadores de KGs por Categoria
             let kgMaxima = 0; let kgLaranja = 0; let kgAmarelo = 0; 
@@ -2964,9 +3005,10 @@
             todasAsObras.forEach(o => {
                 const peso = parseFloat(String(o.kg !== undefined && o.kg !== null ? o.kg : (o.toneladas || 0)).replace(',', '.')) || 0;
                 const polegadas = parseFloat(String(o.polegadas || '0').replace(',', '.')) || 0;
-                const hr = parseFloat(String(o.horas || '0').replace(',', '.')) || 0;
                 
-                // Extração agressiva da prioridade para não falhar com espaços ou diferenças de escrita
+                // Conversão vital de horas para minutos base 60
+                const mins = parseHorasParaMinutos(o.horas);
+                
                 const prioPura = String(o.prioridade || 'Normal').trim().toLowerCase();
 
                 if (prioPura.includes('retrabalho')) totalRetrabalhos++;
@@ -2976,22 +3018,22 @@
                     
                     // Cálculo da nova grelha de Somatórios por Categoria
                     if (prioPura.includes('vermelho') || prioPura.includes('máxima') || prioPura.includes('maxima')) { 
-                        unidMaxima++; horasMaxima += hr; kgMaxima += peso; polMaxima += polegadas; 
+                        unidMaxima++; minsMaxima += mins; kgMaxima += peso; polMaxima += polegadas; 
                     }
                     else if (prioPura.includes('laranja') || prioPura.includes('interna')) { 
-                        unidLaranja++; horasLaranja += hr; kgLaranja += peso; polLaranja += polegadas; 
+                        unidLaranja++; minsLaranja += mins; kgLaranja += peso; polLaranja += polegadas; 
                     }
                     else if (prioPura.includes('amarelo') || prioPura.includes('pintura')) { 
-                        unidAmarelo++; horasAmarelo += hr; kgAmarelo += peso; polAmarelo += polegadas; 
+                        unidAmarelo++; minsAmarelo += mins; kgAmarelo += peso; polAmarelo += polegadas; 
                     }
                     else if (prioPura.includes('raio x') || prioPura.includes('raiox') || prioPura.includes('roxo')) { 
-                        unidRaiox++; horasRaiox += hr; kgRaiox += peso; polRaiox += polegadas; 
+                        unidRaiox++; minsRaiox += mins; kgRaiox += peso; polRaiox += polegadas; 
                     }
                     else if (prioPura.includes('retrabalho')) { 
-                        unidRetrabalhoCat++; horasRetrabalhoCat += hr; kgRetrabalhoCat += peso; polRetrabalhoCat += polegadas; 
+                        unidRetrabalhoCat++; minsRetrabalhoCat += mins; kgRetrabalhoCat += peso; polRetrabalhoCat += polegadas; 
                     }
                     else { 
-                        unidNormal++; horasNormal += hr; kgNormal += peso; polNormal += polegadas; 
+                        unidNormal++; minsNormal += mins; kgNormal += peso; polNormal += polegadas; 
                     }
                 }
 
@@ -3008,7 +3050,7 @@
             
             let taxaRetrabalho = pecasConcluido > 0 ? ((retrabalhosConcluidos / pecasConcluido) * 100).toFixed(1) : 0;
 
-            // Injetar KPIs Gerais na página (Usando a função segura que evita bloqueios)
+            // Injetar KPIs Gerais
             inserirKpiSeguro('kpi-retrabalho-geral', `${totalRetrabalhos} Unid <span class="kpi-subtitle">(${Number(taxaRetrabalho)}% Taxa Final)</span>`);
             inserirKpiSeguro('kpi-tons-ano', Number(totalKgAno.toFixed(2)) + " Kg");
             inserirKpiSeguro('kpi-em-execucao', Number(kgEmExecucao.toFixed(2)) + " Kg <span class='kpi-subtitle'>(" + pecasEmExecucao + " unid)</span>");
@@ -3016,30 +3058,30 @@
             inserirKpiSeguro('kpi-pendentes', Number(kgPendente.toFixed(2)) + " Kg <span class='kpi-subtitle'>(" + pecasPendente + " unid)</span>");
             inserirKpiSeguro('kpi-concluido-final', Number(kgConcluido.toFixed(2)) + " Kg <span class='kpi-subtitle'>(" + pecasConcluido + " unid)</span>");
             
-            // Injetar Nova Grelha de Categorias / Horas / Kg / Pol
+            // Injetar Nova Grelha (Agora exporta o formato limpo 0h00)
             inserirKpiSeguro('kpi-max-unid', `${unidMaxima} Unid`);
             inserirKpiSeguro('kpi-max-detalhes', `⚖️ ${Number(kgMaxima.toFixed(2))} Kg | 📏 ${Number(polMaxima.toFixed(2))}"`);
-            inserirKpiSeguro('kpi-max-horas', `⏱️ ${Number(horasMaxima.toFixed(2))} Horas`);
+            inserirKpiSeguro('kpi-max-horas', `⏱️ ${formatarMinutosParaHoras(minsMaxima)}`);
             
             inserirKpiSeguro('kpi-req-interna', `${unidLaranja} Unid`);
             inserirKpiSeguro('kpi-req-interna-detalhes', `⚖️ ${Number(kgLaranja.toFixed(2))} Kg | 📏 ${Number(polLaranja.toFixed(2))}"`);
-            inserirKpiSeguro('kpi-req-interna-horas', `⏱️ ${Number(horasLaranja.toFixed(2))} Horas`);
+            inserirKpiSeguro('kpi-req-interna-horas', `⏱️ ${formatarMinutosParaHoras(minsLaranja)}`);
             
             inserirKpiSeguro('kpi-pintura-unid', `${unidAmarelo} Unid`);
             inserirKpiSeguro('kpi-pintura-detalhes', `⚖️ ${Number(kgAmarelo.toFixed(2))} Kg | 📏 ${Number(polAmarelo.toFixed(2))}"`);
-            inserirKpiSeguro('kpi-pintura-horas', `⏱️ ${Number(horasAmarelo.toFixed(2))} Horas`);
+            inserirKpiSeguro('kpi-pintura-horas', `⏱️ ${formatarMinutosParaHoras(minsAmarelo)}`);
             
             inserirKpiSeguro('kpi-normal-unid', `${unidNormal} Unid`);
             inserirKpiSeguro('kpi-normal-detalhes', `⚖️ ${Number(kgNormal.toFixed(2))} Kg | 📏 ${Number(polNormal.toFixed(2))}"`);
-            inserirKpiSeguro('kpi-normal-horas', `⏱️ ${Number(horasNormal.toFixed(2))} Horas`);
+            inserirKpiSeguro('kpi-normal-horas', `⏱️ ${formatarMinutosParaHoras(minsNormal)}`);
             
             inserirKpiSeguro('kpi-raiox-unid', `${unidRaiox} Unid`);
             inserirKpiSeguro('kpi-raiox-detalhes', `⚖️ ${Number(kgRaiox.toFixed(2))} Kg | 📏 ${Number(polRaiox.toFixed(2))}"`);
-            inserirKpiSeguro('kpi-raiox-horas', `⏱️ ${Number(horasRaiox.toFixed(2))} Horas`);
+            inserirKpiSeguro('kpi-raiox-horas', `⏱️ ${formatarMinutosParaHoras(minsRaiox)}`);
             
             inserirKpiSeguro('kpi-retrabalho-unid', `${unidRetrabalhoCat} Unid`);
             inserirKpiSeguro('kpi-retrabalho-detalhes', `⚖️ ${Number(kgRetrabalhoCat.toFixed(2))} Kg | 📏 ${Number(polRetrabalhoCat.toFixed(2))}"`);
-            inserirKpiSeguro('kpi-retrabalho-horas', `⏱️ ${Number(horasRetrabalhoCat.toFixed(2))} Horas`);
+            inserirKpiSeguro('kpi-retrabalho-horas', `⏱️ ${formatarMinutosParaHoras(minsRetrabalhoCat)}`);
         }
 
         // -----------------------------------------------------

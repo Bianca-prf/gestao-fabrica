@@ -872,7 +872,7 @@
     <!-- PÁGINA INICIAL -->
     <div id="page-home" class="page active">
         <div class="home-logo-container">
-            <img src="prf_principal_gassolutions.png" alt="PRF Gas Solutions" class="home-logo-img">
+            <img src="prf_principal_gassolutions.png" alt="PRF Gas Solutions" class="home-logo-img" onerror="this.style.display='none'">
         </div>
         <div class="home-title">Sistema de Gestão de Produção</div>
         <div class="home-subtitle">Selecione o módulo pretendido</div>
@@ -1125,7 +1125,7 @@
                 </div>
             </div>
 
-            <!-- QUALIDADE E TRATAMENTO -->
+            <!-- QUALIDADE -->
             <div class="column" style="min-width: 200px; width: 200px;">
                 <div class="column-header">Qualidade (Ismael)</div>
                 <div class="worker-lane" style="margin: 6px; flex-grow: 1; border:none; background:transparent;">
@@ -1138,15 +1138,38 @@
                 </div>
             </div>
             
-            <div class="column" style="min-width: 200px; width: 200px;">
-                <div class="column-header">Tratamento (Igor)</div>
-                <div class="worker-lane" style="margin: 6px; flex-grow: 1; border:none; background:transparent;">
-                    <div class="zone-title" style="background:#e0e7ff; color:#3730a3;">Em Execução</div>
-                    <div class="column-content" style="border: 1px solid var(--border-color); border-radius:4px; background:var(--bg-card); margin-bottom:5px;" data-board="main" data-fase="Tratamento" data-operador="Igor"></div>
-                    <div class="zone-title">Em Fila</div>
-                    <div class="column-content" style="border: 1px solid var(--border-color); border-radius:4px; background:var(--bg-card); margin-bottom:5px;" data-board="main" data-fase="Em Fila" data-setor="Tratamento" data-operador="Igor"></div>
-                    <div class="zone-title">Pendente</div>
-                    <div class="column-content" style="border: 1px solid var(--border-color); border-radius:4px; background:var(--bg-card);" data-board="main" data-fase="Pendente" data-setor="Tratamento" data-operador="Igor"></div>
+            <!-- TRATAMENTO DE SUPERFÍCIES (NOVO LAYOUT) -->
+            <div class="column production-col" style="border-top: 4px solid #0288d1;">
+                <div class="column-header" style="color: #0288d1;">🖌️ TRATAMENTO DE SUPERFÍCIES</div>
+                <div class="sub-sectors-container">
+                    <div class="sub-sector">
+                        <div class="sub-sector-title" style="color:#64748b;">INTERNO</div>
+                        <div class="sub-sector-grid">
+                            <div class="worker-lane">
+                                <div class="worker-title">Igor</div>
+                                <div class="zone-title" style="background:#e0e7ff; color:#3730a3;">Em Execução</div>
+                                <div class="column-content" data-board="main" data-fase="Tratamento de Superfícies" data-setor="Interno" data-operador="Igor"></div>
+                                <div class="zone-title">Em Fila</div>
+                                <div class="column-content" data-board="main" data-fase="Em Fila" data-setor="Interno" data-operador="Igor"></div>
+                                <div class="zone-title">Pendente</div>
+                                <div class="column-content" data-board="main" data-fase="Pendente" data-setor="Interno" data-operador="Igor"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="sub-sector">
+                        <div class="sub-sector-title" style="color:#f57c00;">EXTERNO</div>
+                        <div class="sub-sector-grid">
+                            <div class="worker-lane">
+                                <div class="worker-title">Fornecedor</div>
+                                <div class="zone-title" style="background:#e0e7ff; color:#3730a3;">Em Execução</div>
+                                <div class="column-content" data-board="main" data-fase="Tratamento de Superfícies" data-setor="Externo" data-operador="Externo"></div>
+                                <div class="zone-title">Em Fila</div>
+                                <div class="column-content" data-board="main" data-fase="Em Fila" data-setor="Externo" data-operador="Externo"></div>
+                                <div class="zone-title">Pendente</div>
+                                <div class="column-content" data-board="main" data-fase="Pendente" data-setor="Externo" data-operador="Externo"></div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -1667,8 +1690,8 @@
         // =====================================================
         // LIGAÇÃO SUPABASE
         // =====================================================
-        const supabaseUrl = 'https://hybquplraoiarwfwxiwn.supabase.co';
-        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh5YnF1cGxyYW9pYXJ3Znd4aXduIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkzMDYwMDgsImV4cCI6MjEwNDg4MjAwOH0.1EFqdshaIQJU96rMr8ep9ED6HAkAmmrfz_dTxGN4Hi8';
+        const supabaseUrl = 'https://psuzavfhypvpnvenlwca.supabase.co';
+        const supabaseKey = 'sb_publishable_moeh_0N0GaFDp_8IYbh8NA_OYhkydcO';
         const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
 
         let todasAsObras = [];
@@ -1874,7 +1897,7 @@
                     const s = String(o.setor || '');
                     
                     const isMainProducao = (f === 'Produção' || f === 'Em Fila' || f === 'Pendente');
-                    const isQualiTrat = (f === 'Qualidade' || f === 'Tratamento');
+                    const isQualiTrat = (f === 'Qualidade' || f === 'Tratamento de Superfícies');
                     
                     const isCorteExecEspera = (f === 'Furação e Corte' || f === 'Laser') && (!s || s.includes('Execucao') || s.includes('Espera') || s === 'Aguardar Chapa');
                     
@@ -1962,7 +1985,9 @@
             mostrarAlerta("A gerar relatório Excel do estado atual da fábrica...");
             
             const dadosExcel = todasAsObras.map(o => {
-                const pesoFinal = o.kg !== undefined && o.kg !== null ? o.kg : (o.toneladas || 0);
+                const pesoFinal = parseFloat(String(o.kg !== undefined && o.kg !== null ? o.kg : (o.toneladas || 0)).replace(',', '.')) || 0;
+                const polFinal = parseFloat(String(o.polegadas || '0').replace(',', '.')) || 0;
+                const horasFinal = parseFloat(String(o.horas || '0').replace(',', '.')) || 0;
                 
                 return {
                     "Código Obra": o.obra_ref || "MANUAL", 
@@ -1971,8 +1996,8 @@
                     "Setor": o.setor || "Geral",
                     "Trabalhador": o.trabalhador,
                     "Peso (Kg)": pesoFinal, 
-                    "Polegadas": o.polegadas || 0, 
-                    "Horas Execução": o.horas || 0,
+                    "Polegadas": polFinal, 
+                    "Horas Execução": horasFinal,
                     "Prioridade": o.prioridade || 'Normal', 
                     "Material": o.material || '',
                     "Comentários": o.comentarios || '',
@@ -2482,7 +2507,8 @@
             }
 
             container.innerHTML = resultados.map(o => {
-                const pesoHistorico = o.kg !== undefined && o.kg !== null ? o.kg : (o.toneladas || 0);
+                const pesoHistorico = parseFloat(String(o.kg !== undefined && o.kg !== null ? o.kg : (o.toneladas || 0)).replace(',', '.')) || 0;
+                const polHistorico = parseFloat(String(o.polegadas || '0').replace(',', '.')) || 0;
                 const dataShow = o.data_criacao ? ` | 📅 ${formatarDataVisivel(o.data_criacao)}` : '';
                 return `
                 <div class="consult-item">
@@ -2491,7 +2517,7 @@
                         <span style="font-size: 11px; padding: 2px 6px; border-radius: 4px; background: ${o.fase === 'Arquivado' ? '#555' : 'var(--prf-blue)'}; color: white;">fase: ${escapeHTML(o.fase)}</span>
                     </div>
                     <div style="font-size: 12px; color: var(--text-secondary); margin-top: 6px;">
-                        ⚖️ <b>${pesoHistorico}</b> Kg | 📏 <b>${o.polegadas || 0}"</b> | 👷 Operador: <b>${escapeHTML(o.trabalhador || 'Não Atribuído')}</b> | 🏷️ Prioridade: <b>${escapeHTML(o.prioridade || 'Normal')}</b> ${dataShow}
+                        ⚖️ <b>${Number(pesoHistorico.toFixed(2))}</b> Kg | 📏 <b>${Number(polHistorico.toFixed(2))}"</b> | 👷 Operador: <b>${escapeHTML(o.trabalhador || 'Não Atribuído')}</b> | 🏷️ Prioridade: <b>${escapeHTML(o.prioridade || 'Normal')}</b> ${dataShow}
                     </div>
                 </div>
                 `;
@@ -2545,7 +2571,7 @@
                         } else {
                             novoOperador = 'Não Atribuído';
                         }
-                    } else if (novoOperador === 'Qualquer') {
+                    } else if (novoOperador === 'Qualquer' || novoOperador === 'Externo') {
                         novoOperador = todasAsObras[idx].trabalhador;
                     }
 
@@ -2554,7 +2580,8 @@
                         if(novoSetor === 'Geral' && novaFase === 'Pronto a Iniciar') trackLabel = 'Corte (Pronto)';
                         else trackLabel = novoSetor.replace(/-/g, ' ');
                     } else {
-                        if (novoOperador && novoOperador !== 'Não Atribuído') trackLabel = novoOperador;
+                        if (novoSetor === 'Interno' || novoSetor === 'Externo') trackLabel = `Tratamento ${novoSetor}`;
+                        else if (novoOperador && novoOperador !== 'Não Atribuído') trackLabel = novoOperador;
                         else trackLabel = novaFase;
                     }
                     
@@ -2604,13 +2631,18 @@
                 const p = String(c.prioridade || 'Normal').toLowerCase().replace(/\s+/g, '-');
                 let f = String(c.fase || 'Projeto').replace(/"/g, ''); 
                 if (f === 'Laser') f = 'Furação e Corte';
+                if (f === 'Tratamento') f = 'Tratamento de Superfícies';
                 
                 const t = String(c.trabalhador || 'Não Atribuído').replace(/"/g, ''); 
                 const s = String(c.setor || '').replace(/"/g, '');
                 if (f === 'Em Espera') f = 'Em Fila';
 
                 let z = null;
-                if (f && t && t !== 'Não Atribuído') z = document.querySelector(`#page-kanban .column-content[data-fase="${f}"][data-operador="${t}"]`);
+                
+                // Sistema Inteligente de Distribuição de Colunas:
+                if (f && s && s !== 'Geral' && t && t !== 'Não Atribuído') z = document.querySelector(`#page-kanban .column-content[data-fase="${f}"][data-setor="${s}"][data-operador="${t}"]`);
+                if (!z && f && s && s !== 'Geral') z = document.querySelector(`#page-kanban .column-content[data-fase="${f}"][data-setor="${s}"]`);
+                if (!z && f && t && t !== 'Não Atribuído') z = document.querySelector(`#page-kanban .column-content[data-fase="${f}"][data-operador="${t}"]`);
                 if (!z && f === 'Concluído Setor' && s) z = document.querySelector(`#page-kanban .column-content[data-fase="${f}"][data-setor="${s}"]`);
                 if (!z) z = document.querySelector(`#page-kanban .column-content[data-fase="${f}"]`);
                 if (!z) z = document.querySelector(`#page-kanban .column-content[data-fase="Projeto"]`);
@@ -2625,9 +2657,10 @@
                     const safeRef = escapeHTML(c.referencia);
                     const safeTrab = escapeHTML(t);
                     const bdg = c.obra_ref ? `<div class="obra-badge">${safeObra}</div>` : '';
-                    const vKg = c.kg !== undefined && c.kg !== null ? c.kg : (c.toneladas || 0); 
-                    const vPol = c.polegadas || 0;
-                    const vHoras = c.horas !== undefined && c.horas !== null ? c.horas : 0;
+                    
+                    const vKg = parseFloat(String(c.kg !== undefined && c.kg !== null ? c.kg : (c.toneladas || 0)).replace(',', '.')) || 0; 
+                    const vPol = parseFloat(String(c.polegadas || '0').replace(',', '.')) || 0;
+                    const vHoras = parseFloat(String(c.horas || '0').replace(',', '.')) || 0;
                     
                     let workerDisplay = c.rastreio ? escapeHTML(c.rastreio) : safeTrab;
                     let removeBtnHtml = '';
@@ -2653,7 +2686,7 @@
                         <div class="card-ref">${safeRef || 'Sem Referência'}</div>
                         
                         <div class="card-info" style="margin-top:4px;">
-                            <div style="margin-bottom: 3px;">⚖️ ${vKg} Kg | 📏 ${vPol}" | ⏱️ ${vHoras}h</div>
+                            <div style="margin-bottom: 3px;">⚖️ ${Number(vKg.toFixed(2))} Kg | 📏 ${Number(vPol.toFixed(2))}" | ⏱️ ${Number(vHoras.toFixed(2))}h</div>
                             <div style="display:flex; justify-content:space-between; align-items:flex-start; background:rgba(0,0,0,0.04); padding:3px; border-radius:4px;">
                                 <span style="font-weight:bold; color:var(--prf-blue-dark); word-break:break-word; line-height:1.4;">
                                     👷 ${workerDisplay}
@@ -2710,9 +2743,10 @@
                     const safeMat = escapeHTML(c.material || 'Material N/D');
 
                     const bdg = c.obra_ref ? `<div class="obra-badge">${safeObra}</div>` : '';
-                    const vKg = c.kg !== undefined && c.kg !== null ? c.kg : (c.toneladas || 0); 
-                    const vPol = c.polegadas || 0;
-                    const vHoras = c.horas !== undefined && c.horas !== null ? c.horas : 0;
+                    
+                    const vKg = parseFloat(String(c.kg !== undefined && c.kg !== null ? c.kg : (c.toneladas || 0)).replace(',', '.')) || 0; 
+                    const vPol = parseFloat(String(c.polegadas || '0').replace(',', '.')) || 0;
+                    const vHoras = parseFloat(String(c.horas || '0').replace(',', '.')) || 0;
                     
                     let btnEditar = '';
                     if (currentUserRole !== 'Visualizador') {
@@ -2723,7 +2757,7 @@
                         ${bdg}
                         <div class="card-ref">${safeRef || 'Sem Referência'}</div>
                         <div class="card-info" style="margin-top:4px;">
-                            <div style="margin-bottom: 3px;">⚖️ ${vKg} Kg | 📏 ${vPol}" | ⏱️ ${vHoras}h</div>
+                            <div style="margin-bottom: 3px;">⚖️ ${Number(vKg.toFixed(2))} Kg | 📏 ${Number(vPol.toFixed(2))}" | ⏱️ ${Number(vHoras.toFixed(2))}h</div>
                             <div style="background:rgba(0,0,0,0.04); padding:3px; border-radius:4px; font-weight:bold; color: #ef5350;">
                                 ⚙️ Mat: ${safeMat}
                             </div>
@@ -2756,11 +2790,16 @@
             document.getElementById('details-title').innerText = c.referencia || 'Sem Referência';
             document.getElementById('details-date').innerText = c.data_criacao ? formatarDataVisivel(c.data_criacao) : 'N/A';
             document.getElementById('details-prio').innerText = c.prioridade || 'Normal';
-            const vKg = c.kg !== undefined && c.kg !== null ? c.kg : (c.toneladas || 0); 
-            document.getElementById('details-kg').innerText = vKg;
-            document.getElementById('details-pol').innerText = c.polegadas || 0;
-            const vHoras = c.horas !== undefined && c.horas !== null ? c.horas : 0;
-            document.getElementById('details-horas').innerText = vHoras;
+            
+            const vKg = parseFloat(String(c.kg !== undefined && c.kg !== null ? c.kg : (c.toneladas || 0)).replace(',', '.')) || 0; 
+            document.getElementById('details-kg').innerText = Number(vKg.toFixed(2));
+            
+            const vPol = parseFloat(String(c.polegadas || '0').replace(',', '.')) || 0;
+            document.getElementById('details-pol').innerText = Number(vPol.toFixed(2));
+            
+            const vHoras = parseFloat(String(c.horas || '0').replace(',', '.')) || 0;
+            document.getElementById('details-horas').innerText = Number(vHoras.toFixed(2));
+            
             document.getElementById('details-material').innerText = c.material || 'N/A';
 
             const timelineDiv = document.getElementById('details-timeline');
@@ -2914,9 +2953,9 @@
             let polNormal = 0; let polRaiox = 0; let polRetrabalhoCat = 0;
 
             todasAsObras.forEach(o => {
-                const peso = parseFloat(o.kg !== undefined && o.kg !== null ? o.kg : (o.toneladas || 0)) || 0;
-                const polegadas = parseFloat(o.polegadas) || 0;
-                const hr = parseFloat(o.horas) || 0;
+                const peso = parseFloat(String(o.kg !== undefined && o.kg !== null ? o.kg : (o.toneladas || 0)).replace(',', '.')) || 0;
+                const polegadas = parseFloat(String(o.polegadas || '0').replace(',', '.')) || 0;
+                const hr = parseFloat(String(o.horas || '0').replace(',', '.')) || 0;
                 
                 if (o.prioridade === 'Retrabalho') totalRetrabalhos++;
 
@@ -2942,40 +2981,40 @@
             let taxaRetrabalho = pecasConcluido > 0 ? ((retrabalhosConcluidos / pecasConcluido) * 100).toFixed(1) : 0;
 
             // Injetar KPIs Gerais
-            document.getElementById('kpi-retrabalho').innerHTML = `${totalRetrabalhos} Unid <span class="kpi-subtitle">(${taxaRetrabalho}% de todas as concluídas)</span>`;
-            document.getElementById('kpi-tons-ano').innerText = totalKgAno.toFixed(1) + " Kg";
-            document.getElementById('kpi-em-execucao').innerHTML = kgEmExecucao.toFixed(1) + " Kg <span class='kpi-subtitle'>(" + pecasEmExecucao + " unid)</span>";
-            document.getElementById('kpi-em-fila').innerHTML = kgEmFila.toFixed(1) + " Kg <span class='kpi-subtitle'>(" + pecasEmFila + " unid)</span>";
-            document.getElementById('kpi-pendentes').innerHTML = kgPendente.toFixed(1) + " Kg <span class='kpi-subtitle'>(" + pecasPendente + " unid)</span>";
-            document.getElementById('kpi-concluido-final').innerHTML = kgConcluido.toFixed(1) + " Kg <span class='kpi-subtitle'>(" + pecasConcluido + " unid)</span>";
+            document.getElementById('kpi-retrabalho').innerHTML = `${totalRetrabalhos} Unid <span class="kpi-subtitle">(${Number(taxaRetrabalho)}% de todas as concluídas)</span>`;
+            document.getElementById('kpi-tons-ano').innerText = Number(totalKgAno.toFixed(2)) + " Kg";
+            document.getElementById('kpi-em-execucao').innerHTML = Number(kgEmExecucao.toFixed(2)) + " Kg <span class='kpi-subtitle'>(" + pecasEmExecucao + " unid)</span>";
+            document.getElementById('kpi-em-fila').innerHTML = Number(kgEmFila.toFixed(2)) + " Kg <span class='kpi-subtitle'>(" + pecasEmFila + " unid)</span>";
+            document.getElementById('kpi-pendentes').innerHTML = Number(kgPendente.toFixed(2)) + " Kg <span class='kpi-subtitle'>(" + pecasPendente + " unid)</span>";
+            document.getElementById('kpi-concluido-final').innerHTML = Number(kgConcluido.toFixed(2)) + " Kg <span class='kpi-subtitle'>(" + pecasConcluido + " unid)</span>";
             
             // Injetar Nova Grelha de Categorias / Horas / Kg / Pol
             document.getElementById('kpi-max-unid').innerText = `${unidMaxima} Unid`;
-            document.getElementById('kpi-max-detalhes').innerText = `⚖️ ${kgMaxima.toFixed(1)} Kg | 📏 ${polMaxima.toFixed(1)}"`;
-            document.getElementById('kpi-max-horas').innerText = `⏱️ ${horasMaxima.toFixed(1)} Horas`;
+            document.getElementById('kpi-max-detalhes').innerText = `⚖️ ${Number(kgMaxima.toFixed(2))} Kg | 📏 ${Number(polMaxima.toFixed(2))}"`;
+            document.getElementById('kpi-max-horas').innerText = `⏱️ ${Number(horasMaxima.toFixed(2))} Horas`;
             
             document.getElementById('kpi-req-interna').innerText = `${unidLaranja} Unid`;
-            document.getElementById('kpi-req-interna-detalhes').innerText = `⚖️ ${kgLaranja.toFixed(1)} Kg | 📏 ${polLaranja.toFixed(1)}"`;
-            document.getElementById('kpi-req-interna-horas').innerText = `⏱️ ${horasLaranja.toFixed(1)} Horas`;
+            document.getElementById('kpi-req-interna-detalhes').innerText = `⚖️ ${Number(kgLaranja.toFixed(2))} Kg | 📏 ${Number(polLaranja.toFixed(2))}"`;
+            document.getElementById('kpi-req-interna-horas').innerText = `⏱️ ${Number(horasLaranja.toFixed(2))} Horas`;
             
             document.getElementById('kpi-pintura-unid').innerText = `${unidAmarelo} Unid`;
-            document.getElementById('kpi-pintura-detalhes').innerText = `⚖️ ${kgAmarelo.toFixed(1)} Kg | 📏 ${polAmarelo.toFixed(1)}"`;
-            document.getElementById('kpi-pintura-horas').innerText = `⏱️ ${horasAmarelo.toFixed(1)} Horas`;
+            document.getElementById('kpi-pintura-detalhes').innerText = `⚖️ ${Number(kgAmarelo.toFixed(2))} Kg | 📏 ${Number(polAmarelo.toFixed(2))}"`;
+            document.getElementById('kpi-pintura-horas').innerText = `⏱️ ${Number(horasAmarelo.toFixed(2))} Horas`;
             
             document.getElementById('kpi-normal-unid').innerText = `${unidNormal} Unid`;
-            document.getElementById('kpi-normal-detalhes').innerText = `⚖️ ${kgNormal.toFixed(1)} Kg | 📏 ${polNormal.toFixed(1)}"`;
-            document.getElementById('kpi-normal-horas').innerText = `⏱️ ${horasNormal.toFixed(1)} Horas`;
+            document.getElementById('kpi-normal-detalhes').innerText = `⚖️ ${Number(kgNormal.toFixed(2))} Kg | 📏 ${Number(polNormal.toFixed(2))}"`;
+            document.getElementById('kpi-normal-horas').innerText = `⏱️ ${Number(horasNormal.toFixed(2))} Horas`;
             
             document.getElementById('kpi-raiox-unid').innerText = `${unidRaiox} Unid`;
-            document.getElementById('kpi-raiox-detalhes').innerText = `⚖️ ${kgRaiox.toFixed(1)} Kg | 📏 ${polRaiox.toFixed(1)}"`;
-            document.getElementById('kpi-raiox-horas').innerText = `⏱️ ${horasRaiox.toFixed(1)} Horas`;
+            document.getElementById('kpi-raiox-detalhes').innerText = `⚖️ ${Number(kgRaiox.toFixed(2))} Kg | 📏 ${Number(polRaiox.toFixed(2))}"`;
+            document.getElementById('kpi-raiox-horas').innerText = `⏱️ ${Number(horasRaiox.toFixed(2))} Horas`;
             
             const elRetrabalhoUnid = document.getElementById('kpi-retrabalho-unid');
             const elRetrabalhoDetalhes = document.getElementById('kpi-retrabalho-detalhes');
             const elRetrabalhoHoras = document.getElementById('kpi-retrabalho-horas');
             if(elRetrabalhoUnid) elRetrabalhoUnid.innerText = `${unidRetrabalhoCat} Unid`;
-            if(elRetrabalhoDetalhes) elRetrabalhoDetalhes.innerText = `⚖️ ${kgRetrabalhoCat.toFixed(1)} Kg | 📏 ${polRetrabalhoCat.toFixed(1)}"`;
-            if(elRetrabalhoHoras) elRetrabalhoHoras.innerText = `⏱️ ${horasRetrabalhoCat.toFixed(1)} Horas`;
+            if(elRetrabalhoDetalhes) elRetrabalhoDetalhes.innerText = `⚖️ ${Number(kgRetrabalhoCat.toFixed(2))} Kg | 📏 ${Number(polRetrabalhoCat.toFixed(2))}"`;
+            if(elRetrabalhoHoras) elRetrabalhoHoras.innerText = `⏱️ ${Number(horasRetrabalhoCat.toFixed(2))} Horas`;
         }
 
         // -----------------------------------------------------
@@ -2990,7 +3029,11 @@
 
             while (keepFetching) {
                 const { data, error } = await supabaseClient.from('cartoes_kanban').select('*').range(from, from + step);
-                if (error) { mostrarAlerta('Erro de ligação à BD.'); break; }
+                if (error) { 
+                    mostrarAlerta('ERRO BD: ' + error.message + ' | Cód: ' + error.code); 
+                    keepFetching = false;
+                    break; 
+                }
                 if (data && data.length > 0) { allData = allData.concat(data); from += data.length; if (data.length <= step) keepFetching = false; } 
                 else { keepFetching = false; }
             }

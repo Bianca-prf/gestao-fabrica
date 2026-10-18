@@ -1,0 +1,3009 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PRF - Gas Solutions | Gestão de Produção</title>
+    
+    <!-- Bibliotecas Externas -->
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    
+    <style>
+        /* =========================================
+           TEMA CLARO E TEMA ESCURO
+           ========================================= */
+        :root {
+            --prf-blue: #0097A7;
+            --prf-blue-dark: #00796B;
+            --prf-blue-light: #00bcd4;
+            --bg-main: #f4f6f8;
+            --bg-card: #ffffff;
+            --bg-subcard: #eef2f5;
+            --text-main: #1e293b;
+            --text-secondary: #64748b;
+            --border-color: #cbd5e1;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-main: #121212;
+                --bg-card: #1e1e1e;
+                --bg-subcard: #182228;
+                --text-main: #ffffff;
+                --text-secondary: #b0bec5;
+                --border-color: #334155;
+            }
+        }
+
+        * { 
+            box-sizing: border-box; 
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto; 
+        }
+
+        /* =========================================
+           CABEÇALHO
+           ========================================= */
+        header {
+            background-color: var(--bg-card);
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 3px solid var(--prf-blue);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .brand-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 18px;
+            font-weight: bold;
+            color: var(--prf-blue-light);
+            cursor: pointer;
+        }
+
+        .header-logo-img { 
+            height: 38px; 
+            width: auto; 
+            border-radius: 4px; 
+            background: #ffffff; 
+            padding: 2px; 
+            object-fit: contain; 
+        }
+
+        .header-buttons { 
+            display: flex; 
+            gap: 10px; 
+            align-items: center; 
+            flex-wrap: wrap;
+        }
+
+        .btn-header {
+            background-color: var(--prf-blue); 
+            color: #ffffff; 
+            border: none; 
+            padding: 8px 14px;
+            border-radius: 4px; 
+            cursor: pointer; 
+            font-size: 12px; 
+            font-weight: bold; 
+            display: flex; 
+            align-items: center; 
+            gap: 6px;
+        }
+
+        .btn-header:hover { 
+            background-color: var(--prf-blue-dark); 
+        }
+
+        .btn-refresh { 
+            background-color: #64748b; 
+        }
+
+        .btn-refresh:hover { 
+            background-color: #475569; 
+        }
+
+        /* =========================================
+           PÁGINAS GERAIS E MENU INICIAL
+           ========================================= */
+        .page { 
+            display: none; 
+            padding: 20px; 
+            flex-grow: 1; 
+        }
+
+        .page.active { 
+            display: flex; 
+            flex-direction: column; 
+        }
+
+        #page-home { 
+            align-items: center; 
+            justify-content: center; 
+            text-align: center; 
+            gap: 15px; 
+        }
+
+        .home-logo-container { 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            margin-bottom: 10px; 
+        }
+
+        .home-logo-img { 
+            width: 220px; 
+            max-width: 80vw; 
+            height: auto; 
+            border-radius: 12px; 
+            box-shadow: 0 6px 20px rgba(0, 151, 167, 0.3); 
+            background: #ffffff; 
+            padding: 8px; 
+            object-fit: contain; 
+        }
+
+        .home-title { 
+            font-size: 24px; 
+            color: var(--text-main); 
+            margin-top: 10px; 
+            font-weight: bold; 
+        }
+
+        .home-subtitle { 
+            font-size: 14px; 
+            color: var(--text-secondary); 
+        }
+
+        .menu-grid { 
+            display: flex; 
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px; 
+            margin-top: 15px; 
+            max-width: 800px;
+        }
+
+        .menu-card {
+            background: var(--bg-card); 
+            border: 1px solid var(--border-color); 
+            border-radius: 10px; 
+            padding: 22px 15px;
+            cursor: pointer; 
+            transition: transform 0.2s, border-color 0.2s; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            gap: 10px;
+            width: 210px;
+        }
+
+        .menu-card:hover { 
+            transform: translateY(-4px); 
+            border-color: var(--prf-blue); 
+        }
+
+        .menu-icon { 
+            font-size: 30px; 
+        }
+
+        .menu-label { 
+            font-size: 14px; 
+            font-weight: bold; 
+            color: var(--text-main); 
+        }
+
+        /* =========================================
+           FORMULÁRIOS E PESQUISA
+           ========================================= */
+        .search-container { 
+            background: var(--bg-card); 
+            padding: 15px; 
+            border-radius: 8px; 
+            margin-bottom: 15px; 
+            border: 2px solid var(--prf-blue); 
+        }
+
+        .search-input-large { 
+            width: 100%; 
+            padding: 12px; 
+            font-size: 16px; 
+            border-radius: 6px; 
+            border: 1px solid var(--border-color); 
+            background: var(--bg-subcard); 
+            color: var(--text-main); 
+        }
+
+        .bulk-actions-bar {
+            display: flex; 
+            gap: 10px; 
+            margin-bottom: 15px; 
+            flex-wrap: wrap; 
+            padding: 10px;
+            background: var(--bg-card); 
+            border-radius: 6px; 
+            border: 1px dashed var(--border-color); 
+            align-items: center;
+        }
+
+        .add-form {
+            display: flex; 
+            gap: 10px; 
+            align-items: center; 
+            margin-bottom: 15px; 
+            background: var(--bg-card);
+            padding: 12px 15px; 
+            border-radius: 6px; 
+            border: 1px solid var(--border-color); 
+            flex-wrap: wrap;
+        }
+
+        .add-form input, 
+        .add-form select, 
+        .modal input, 
+        .modal select, 
+        .modal textarea {
+            padding: 8px 12px; 
+            border-radius: 4px; 
+            border: 1px solid var(--border-color); 
+            background: var(--bg-subcard); 
+            color: var(--text-main); 
+            font-size: 13px;
+        }
+
+        .btn-action {
+            background-color: var(--prf-blue) !important; 
+            color: #ffffff !important; 
+            border: none !important;
+            padding: 9px 18px !important; 
+            border-radius: 4px !important; 
+            font-size: 13px !important; 
+            font-weight: bold !important; 
+            cursor: pointer !important;
+        }
+
+        /* =========================================
+           BARRA DE SCROLL NO TOPO
+           ========================================= */
+        .top-scroll-wrapper {
+            overflow-x: auto; 
+            overflow-y: hidden; 
+            min-height: 14px; 
+            background: #e2e8f0; 
+            border-radius: 6px;
+            margin-bottom: 5px; 
+            cursor: pointer; 
+            position: sticky; 
+            top: 61px; 
+            z-index: 90;
+        }
+
+        .top-scroll-dummy { 
+            height: 14px; 
+        }
+
+        /* =========================================
+           KANBAN BOARD E COLUNAS
+           ========================================= */
+        .board {
+            display: flex; 
+            gap: 12px; 
+            overflow-x: auto; 
+            flex-grow: 1; 
+            padding-bottom: 15px; 
+            align-items: flex-start;
+        }
+
+        .column {
+            background-color: var(--bg-card); 
+            border-radius: 8px; 
+            min-width: 210px; 
+            width: 210px;
+            display: flex; 
+            flex-direction: column; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1); 
+            border: 1px solid var(--border-color);
+            transform: translateZ(0); 
+        }
+
+        .column.production-col { 
+            min-width: auto; 
+            width: auto; 
+            border: 2px solid var(--prf-blue); 
+        }
+
+        .column-header {
+            padding: 10px; 
+            font-weight: bold; 
+            font-size: 12px; 
+            color: var(--prf-blue); 
+            border-bottom: 2px solid var(--border-color);
+            text-transform: uppercase; 
+            text-align: center; 
+            background-color: var(--bg-subcard); 
+            border-top-left-radius: 8px; 
+            border-top-right-radius: 8px;
+        }
+
+        /* SUBSETORES (Produção) */
+        .sub-sectors-container { 
+            display: flex; 
+            gap: 8px; 
+            padding: 8px; 
+            flex-grow: 1; 
+            align-items: flex-start; 
+        }
+
+        .sub-sector {
+            background: var(--bg-subcard); 
+            border-radius: 6px; 
+            padding: 6px; 
+            border: 1px dashed var(--border-color); 
+            display: flex; 
+            flex-direction: column;
+        }
+
+        .sub-sector-title {
+            font-size: 11px; 
+            font-weight: bold; 
+            color: #f57c00; 
+            text-align: center; 
+            margin-bottom: 6px; 
+            padding-bottom: 4px; 
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .sub-sector-grid { 
+            display: flex; 
+            gap: 6px; 
+            align-items: flex-start; 
+        }
+        
+        .worker-lane {
+            background: var(--bg-card); 
+            display: flex; 
+            flex-direction: column; 
+            min-width: 140px; 
+            width: 140px; 
+            margin-top: 4px; 
+            border-radius: 4px; 
+            border: 1px solid var(--border-color);
+        }
+
+        .worker-title {
+            font-size: 10px; 
+            color: var(--text-secondary); 
+            font-weight: bold; 
+            text-align: center; 
+            padding: 4px; 
+            background: #e2e8f0; 
+            margin-bottom: 0; 
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .zone-title {
+            font-size: 9px; 
+            font-weight: bold; 
+            text-align: center; 
+            background-color: #f1f5f9; 
+            color: #333; 
+            padding: 2px; 
+            border-bottom: 1px solid #cbd5e1; 
+            border-top: 1px solid #cbd5e1;
+        }
+
+        .column-content {
+            padding: 6px; 
+            display: flex; 
+            flex-direction: column; 
+            flex-grow: 1; 
+            min-height: 80px; 
+        }
+
+        .column-content.drag-over { 
+            background-color: rgba(0, 151, 167, 0.1); 
+            border: 2px dashed var(--prf-blue); 
+            border-radius: 5px; 
+        }
+
+        .sector-done-lane {
+            display: flex; 
+            flex-direction: column; 
+            min-width: 130px; 
+            width: 130px; 
+            border-left: 2px dashed #cbd5e1; 
+            padding-left: 6px; 
+            margin-top: 4px;
+        }
+
+        .sector-done-lane .worker-title { 
+            color: white; 
+            background: #2e7d32; 
+        }
+
+        /* =========================================
+           CORES TOTAIS DOS CARTÕES E BLINDAGEM MESTRE
+           ========================================= */
+        .card {
+            border-radius: 5px; 
+            padding: 9px; 
+            margin-bottom: 8px; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            cursor: grab; 
+            user-select: none; 
+            transition: transform 0.1s;
+            position: relative;
+        }
+
+        .card:active { 
+            cursor: grabbing; 
+            opacity: 0.8; 
+        }
+        
+        .card * { 
+            pointer-events: none; 
+        }
+        
+        .card-actions button, 
+        .btn-rastreio-del { 
+            pointer-events: auto; 
+        }
+
+        .card.prio-sem-cor { background-color: var(--bg-card) !important; border: 1px dashed var(--border-color); }
+        .card.prio-sem-cor * { color: var(--text-main) !important; }
+        .card.prio-sem-cor .card-info, .card.prio-sem-cor .btn-card { color: var(--text-secondary) !important; }
+        .card.prio-sem-cor .obra-badge { background: #cbd5e1 !important; color: #1e293b !important; }
+
+        .card.prio-retrabalho { background-color: #94a3b8 !important; border: none; }
+        .card.prio-retrabalho * { color: #ffffff !important; }
+
+        .card.prio-raio-x { background-color: #9c27b0 !important; border: none; }
+        .card.prio-raio-x * { color: #ffffff !important; }
+        
+        .card.prio-vermelho { background-color: #ef5350 !important; border: none; }
+        .card.prio-vermelho * { color: #ffffff !important; }
+
+        /* MODO DE COMPATIBILIDADE PARA OBRAS ANTIGAS */
+        .card.prio-laranja, .card.prio-média, .card.prio-media { background-color: #ff9800 !important; border: none; }
+        .card.prio-laranja *, .card.prio-média *, .card.prio-media * { color: #ffffff !important; }
+
+        .card.prio-amarelo, .card.prio-baixa { background-color: #ffeb3b !important; border: none; }
+        .card.prio-amarelo *, .card.prio-baixa * { color: #222222 !important; }
+
+        .card.prio-normal { background-color: var(--bg-card) !important; border: 1px solid var(--border-color); }
+        .card.prio-normal .card-ref { color: var(--text-main) !important; }
+        .card.prio-normal .card-info, .card.prio-normal .btn-card { color: var(--text-secondary) !important; }
+
+        .obra-badge {
+            display: inline-block; 
+            background: rgba(0,0,0,0.3); 
+            font-size: 10px; 
+            font-weight: bold;
+            padding: 2px 6px; 
+            border-radius: 4px; 
+            margin-bottom: 4px;
+        }
+
+        .card.prio-normal .obra-badge { 
+            background: var(--prf-blue) !important; 
+            color: white !important;
+        }
+
+        .card-ref { 
+            font-weight: bold; 
+            font-size: 11px; 
+            line-height: 1.2; 
+            margin-bottom: 4px; 
+            word-break: break-word; 
+            padding-right: 45px; 
+        }
+
+        .card-info { 
+            font-size: 10px; 
+            margin-top: 3px; 
+        }
+
+        .card-actions { 
+            display: flex; 
+            justify-content: space-between; 
+            margin-top: 6px; 
+            padding-top: 4px; 
+            border-top: 1px solid rgba(128,128,128,0.3); 
+        }
+
+        .btn-card { 
+            background: none !important; 
+            border: none !important; 
+            cursor: pointer !important; 
+            font-size: 11px !important; 
+            padding: 0 !important; 
+            font-weight: bold; 
+        }
+
+        .laser-ready-badge {
+            background: #2e7d32;
+            color: #ffffff;
+            padding: 2px 5px;
+            font-size: 9px;
+            border-radius: 3px;
+            font-weight: bold;
+            display: inline-block;
+            margin-bottom: 4px;
+        }
+
+        /* =========================================
+           MODAIS DE AVISOS, EDIÇÃO E DETALHES
+           ========================================= */
+        .modal-overlay {
+            display: none; 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7); 
+            z-index: 9999; 
+            justify-content: center; 
+            align-items: center;
+        }
+
+        .modal-overlay.active { 
+            display: flex; 
+        }
+
+        .modal {
+            background: var(--bg-card); 
+            border: 1px solid var(--prf-blue); 
+            padding: 20px; 
+            border-radius: 8px; 
+            width: 500px;
+            max-width: 90%; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 12px; 
+            color: var(--text-main); 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            max-height: 90vh; 
+            overflow-y: auto; 
+        }
+
+        .modal h3 { 
+            margin: 0; 
+            color: var(--prf-blue-light); 
+            font-size: 18px; 
+        }
+
+        .modal label { 
+            font-size: 12px; 
+            color: var(--text-secondary); 
+            margin-bottom: -6px; 
+        }
+
+        /* ESTILOS ESPECÍFICOS PARA O POP-UP DE DETALHES */
+        .details-header {
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 10px;
+            margin-bottom: 10px;
+            display: flex; 
+            justify-content: space-between; 
+            align-items: flex-start;
+        }
+        
+        .details-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: var(--prf-blue);
+            margin-bottom: 5px;
+        }
+
+        .details-badge {
+            display: inline-block;
+            background: var(--bg-subcard);
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: bold;
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+        }
+
+        .details-section {
+            background: var(--bg-subcard);
+            border-radius: 6px;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 10px;
+        }
+
+        .details-section-title {
+            font-size: 11px;
+            text-transform: uppercase;
+            font-weight: bold;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            border-bottom: 1px solid #cbd5e1;
+            padding-bottom: 4px;
+        }
+
+        .details-timeline {
+            font-size: 13px;
+            line-height: 1.5;
+            color: var(--prf-blue-dark);
+            font-weight: 500;
+        }
+
+        .details-comments-list {
+            margin: 0;
+            padding-left: 20px;
+            font-size: 12px;
+            color: var(--text-main);
+        }
+
+        .details-comments-list li {
+            margin-bottom: 6px;
+        }
+
+        /* =========================================
+           KPIS GRID E CONSULTAS
+           ========================================= */
+        .kpi-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); 
+            gap: 15px; 
+            margin-bottom: 25px; 
+        }
+
+        .kpi-card { 
+            background: var(--bg-card); /* Fundo sempre adaptável (claro/escuro) */
+            padding: 20px; 
+            border-radius: 8px; 
+            border-left: 4px solid var(--prf-blue); 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05); 
+        }
+
+        .kpi-title { 
+            font-size: 12px; 
+            color: var(--text-secondary); 
+            text-transform: uppercase; 
+            font-weight: bold;
+        }
+
+        .kpi-value { 
+            font-size: 24px; 
+            font-weight: bold; 
+            color: var(--text-main); 
+            margin-top: 8px; 
+        }
+
+        .kpi-subtitle { 
+            font-size: 13px; 
+            color: var(--text-secondary); 
+            font-weight: normal; 
+            margin-left: 5px; 
+        }
+        
+        /* Formatação do Valor Grande (Para as Horas nas Categorias) */
+        .kpi-value-highlight {
+            font-size: 20px;
+            font-weight: bold;
+            color: var(--text-main); /* Adaptável claro/escuro para sempre se ler */
+            margin-top: 5px;
+            padding-top: 5px;
+            border-top: 1px dashed rgba(128,128,128,0.3);
+        }
+
+        .consult-item { 
+            background: var(--bg-card); 
+            border: 1px solid var(--border-color); 
+            border-left: 5px solid var(--prf-blue); 
+            border-radius: 6px; 
+            padding: 12px; 
+            margin-bottom: 10px; 
+        }
+
+        /* =========================================
+           ESTILOS DO NOVO MÓDULO: BRIEFING DIÁRIO
+           ========================================= */
+        .briefing-container {
+            background: var(--bg-card);
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 20px;
+        }
+        .briefing-header-notes {
+            width: 100%;
+            border: 1px dashed var(--border-color);
+            padding: 10px;
+            font-size: 13px;
+            margin-bottom: 15px;
+            background: var(--bg-subcard);
+            color: var(--text-main);
+            border-radius: 4px;
+            resize: vertical;
+        }
+        .briefing-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+            background: #ffffff;
+        }
+        .briefing-table th {
+            background-color: #7cb342;
+            color: white;
+            padding: 8px;
+            text-align: left;
+            border: 1px solid #ccc;
+        }
+        .briefing-table td {
+            border: 1px solid #ccc;
+            padding: 6px;
+            vertical-align: top;
+            color: #1e293b;
+        }
+        .briefing-input {
+            width: 100%;
+            border: 1px solid transparent;
+            background: transparent;
+            font-family: inherit;
+            font-size: 12px;
+            color: #1e293b;
+            resize: vertical;
+        }
+        .briefing-input:focus {
+            border-bottom: 1px solid var(--prf-blue);
+            outline: none;
+            background: #fdfdfd;
+        }
+        .estado-red {
+            color: #d32f2f;
+            font-weight: bold;
+        }
+        .briefing-action-bar {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+
+        @media print {
+            body * { visibility: hidden; }
+            #page-briefing, #page-briefing * { visibility: visible; }
+            #page-briefing { position: absolute; left: 0; top: 0; width: 100%; padding: 0; margin: 0; }
+            .no-print { display: none !important; }
+            .briefing-table th { background-color: #7cb342 !important; color: white !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .briefing-input { border: none !important; resize: none; overflow: visible; }
+            header, .menu-grid, .search-container, .briefing-action-bar { display: none !important; }
+            body { background-color: white; }
+        }
+
+        /* =========================================
+           ECRÃ DE LOGIN (NOVO MÓDULO DE SEGURANÇA)
+           ========================================= */
+        #login-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg-main);
+            z-index: 10000;
+            display: none; 
+            align-items: center;
+            justify-content: center;
+        }
+        .login-box {
+            background: var(--bg-card);
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            width: 320px;
+            text-align: center;
+            border-top: 4px solid var(--prf-blue);
+        }
+        .login-box input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            background: var(--bg-subcard);
+            color: var(--text-main);
+        }
+        .login-box button {
+            width: 100%;
+            background: var(--prf-blue);
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .login-box button:hover {
+            background: var(--prf-blue-dark);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ECRÃ DE LOGIN OBRIGATÓRIO -->
+    <div id="login-screen">
+        <div class="login-box">
+            <img src="prf_principal_gassolutions.png" alt="PRF Logo" style="height:40px; margin-bottom:15px; background:white; padding:5px; border-radius:4px;" onerror="this.style.display='none'">
+            <h3 style="margin-top:0; color:var(--text-main);">Acesso de Produção</h3>
+            <p style="font-size:12px; color:var(--text-secondary); margin-bottom:20px;">Insira as suas credenciais para aceder ao painel.</p>
+            <input type="email" id="login-email" placeholder="O seu E-mail">
+            <input type="password" id="login-password" placeholder="Password">
+            <button onclick="fazerLogin()">Login</button>
+        </div>
+    </div>
+
+    <!-- CABEÇALHO DA APP -->
+    <header>
+        <div class="brand-logo" onclick="navesPara('page-home')">
+            <img src="prf_principal_gassolutions.png" alt="PRF Logo" class="header-logo-img" onerror="this.style.display='none'">
+            <span>PRF Gas Solutions</span>
+        </div>
+        <div class="header-buttons">
+            <span id="header-user-name" style="font-size: 11px; color: var(--text-secondary); margin-right: 10px;">👤 A aguardar...</span>
+            <button class="btn-header" style="background-color: #455a64;" onclick="navesPara('page-kanban')">📊 Produção</button>
+            <button class="btn-header" style="background-color: #ef5350;" onclick="navesPara('page-laser')">⚙️ Furação e Corte</button>
+            <button class="btn-header btn-refresh" onclick="limparCacheERefresh()">🔄 Atualizar</button>
+            <button class="btn-header" onclick="navesPara('page-home')">🏠 Menu</button>
+            <button class="btn-header" style="background-color: transparent; border: 1px solid var(--border-color); color: var(--text-main);" onclick="fazerLogout()">🚪 Sair</button>
+        </div>
+    </header>
+
+    <!-- PÁGINA INICIAL -->
+    <div id="page-home" class="page active">
+        <div class="home-logo-container">
+            <img src="prf_principal_gassolutions.png" alt="PRF Gas Solutions" class="home-logo-img">
+        </div>
+        <div class="home-title">Sistema de Gestão de Produção</div>
+        <div class="home-subtitle">Selecione o módulo pretendido</div>
+        
+        <div class="menu-grid">
+            <div class="menu-card" onclick="navesPara('page-kanban')">
+                <span class="menu-icon">📊</span>
+                <span class="menu-label">Quadro Produção</span>
+            </div>
+            
+            <div class="menu-card" onclick="navesPara('page-laser')" style="border-color: #ef5350;">
+                <span class="menu-icon">⚙️</span>
+                <span class="menu-label">Furação e Corte</span>
+            </div>
+            
+            <div class="menu-card" onclick="navesPara('page-consultas')">
+                <span class="menu-icon">🔍</span>
+                <span class="menu-label">Consultas</span>
+            </div>
+            <div class="menu-card" onclick="navesPara('page-kpis')">
+                <span class="menu-icon">📈</span>
+                <span class="menu-label">KPIs & Métricas</span>
+            </div>
+            <div class="menu-card" onclick="navesPara('page-briefing')" style="border-color: #7cb342;">
+                <span class="menu-icon">📋</span>
+                <span class="menu-label">Briefing Diário</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- PÁGINA KANBAN (QUADRO DE PRODUÇÃO PRINCIPAL) -->
+    <div id="page-kanban" class="page">
+        
+        <div class="search-container">
+            <div style="display: flex; justify-content: space-between; align-items: baseline;">
+                <p style="font-size: 12px; color: var(--prf-blue-light); margin-top: 0; margin-bottom: 8px;">
+                    * <b>PESQUISA DE PRODUÇÃO:</b> Filtre obras no quadro geral.
+                </p>
+                <span id="db-counter" style="font-size: 13px; color: var(--prf-blue); font-weight: bold;">🟢 A carregar dados...</span>
+            </div>
+            <input type="text" id="kanban-search-input" class="search-input-large" placeholder="🔎 Pesquisar código de Obra, Peça, Trabalhador, Material..." onkeyup="renderizarKanbanComFiltro()">
+        </div>
+
+        <div class="bulk-actions-bar" id="admin-actions-bar">
+            <span style="font-size: 12px; color: var(--text-secondary); font-weight: bold;">⚙️ Operações:</span>
+            <button class="btn-action" style="background-color: #455a64 !important; padding: 6px 12px !important;" onclick="limparProjetos()">🧹 Limpar Projetos</button>
+            <button class="btn-action" style="background-color: #2e7d32 !important; padding: 6px 12px !important;" onclick="limparConcluidos()">✅ Arquivar Concluídos</button>
+            <button class="btn-action" style="background-color: #0288d1 !important; padding: 6px 12px !important; margin-left: 10px;" onclick="abrirMenuBackup()">🛡️ Central de Checkpoints</button>
+            <button class="btn-action" style="background-color: #d32f2f !important; padding: 6px 12px !important; margin-left: auto;" onclick="apagarTudoBD()">🚨 Apagar Tudo</button>
+        </div>
+
+        <div class="add-form" id="admin-add-form">
+            <input type="text" id="new-ref" placeholder="Nome/Referência" style="width: 160px;">
+            <input type="number" id="new-kg" placeholder="Kg" step="any" style="width: 70px;">
+            <input type="number" id="new-pol" placeholder="Pol ('')" step="any" style="width: 70px;">
+            <input type="number" id="new-horas" placeholder="Horas" step="any" style="width: 70px;">
+            <input type="text" id="new-material" placeholder="Material (Ex: Inox)" style="width: 120px;">
+            <select id="new-prio">
+                <option value="Sem Cor">⚪ Sem Categoria (Branco)</option>
+                <option value="Vermelho">🔴 Máxima</option>
+                <option value="Laranja">🟠 Requisição Interna</option>
+                <option value="Amarelo" selected>🟡 Pintura Externa</option>
+                <option value="Normal">🔵 Normal</option>
+                <option value="Raio X">🟣 Raio X</option>
+                <option value="Retrabalho">🔘 Retrabalho</option>
+            </select>
+            <button class="btn-action" onclick="adicionarObraModalData()">+ Adicionar Manual</button>
+            
+            <label class="btn-action" style="cursor:pointer; background-color: #374151 !important; margin-left: auto;">
+                📂 Importar do Excel
+                <input type="file" id="excel-input" accept=".xlsx, .xls" onchange="importarExcelInteligenteModal(event)" style="display:none;">
+            </label>
+        </div>
+
+        <div class="top-scroll-wrapper" id="topScrollWrapper">
+            <div class="top-scroll-dummy" id="topScrollDummy"></div>
+        </div>
+
+        <div class="board" id="boardKanban">
+            
+            <div class="column" style="min-width: 200px; width: 200px;">
+                <div class="column-header">Projeto</div>
+                <div class="column-content" data-board="main" data-fase="Projeto"></div>
+            </div>
+            
+            <div class="column" style="min-width: 200px; width: 200px;">
+                <div class="column-header">Desenho</div>
+                <div class="column-content" data-board="main" data-fase="Desenho"></div>
+            </div>
+            
+            <div class="column" style="min-width: 200px; width: 200px;">
+                <div class="column-header">Material (Camila)</div>
+                <div class="column-content" data-board="main" data-fase="Material" data-operador="Camila"></div>
+            </div>
+
+            <div class="column" style="min-width: 200px; width: 200px; border: 2px solid #ef5350;">
+                <div class="column-header" style="color: #ef5350;">⚙ Furação e Corte</div>
+                <div class="column-content" data-board="main" data-fase="Furação e Corte"></div>
+            </div>
+            
+            <div class="column" style="min-width: 200px; width: 200px; border: 2px solid #2e7d32; background: #e8f5e9;">
+                <div class="column-header" style="color: #1b5e20;">✅ Pronto a Iniciar</div>
+                <div class="column-content" data-board="main" data-fase="Pronto a Iniciar"></div>
+            </div>
+
+            <!-- ÁREA DE PRODUÇÃO -->
+            <div class="column production-col">
+                <div class="column-header">⚙️ PRODUÇÃO (POR TRABALHADOR)</div>
+                <div class="sub-sectors-container">
+                    
+                    <div class="sub-sector">
+                        <div class="sub-sector-title">👨‍🏭 TUBISTAS</div>
+                        <div class="sub-sector-grid">
+                            <div class="worker-lane">
+                                <div class="worker-title">Suellen</div>
+                                <div class="zone-title" style="background:#e0e7ff; color:#3730a3;">Em Execução</div>
+                                <div class="column-content" data-board="main" data-fase="Produção" data-setor="Tubistas" data-operador="Suellen"></div>
+                                <div class="zone-title">Em Fila</div>
+                                <div class="column-content" data-board="main" data-fase="Em Fila" data-setor="Tubistas" data-operador="Suellen"></div>
+                                <div class="zone-title">Pendente</div>
+                                <div class="column-content" data-board="main" data-fase="Pendente" data-setor="Tubistas" data-operador="Suellen"></div>
+                            </div>
+                            <div class="worker-lane">
+                                <div class="worker-title">José</div>
+                                <div class="zone-title" style="background:#e0e7ff; color:#3730a3;">Em Execução</div>
+                                <div class="column-content" data-board="main" data-fase="Produção" data-setor="Tubistas" data-operador="José"></div>
+                                <div class="zone-title">Em Fila</div>
+                                <div class="column-content" data-board="main" data-fase="Em Fila" data-setor="Tubistas" data-operador="José"></div>
+                                <div class="zone-title">Pendente</div>
+                                <div class="column-content" data-board="main" data-fase="Pendente" data-setor="Tubistas" data-operador="José"></div>
+                            </div>
+                            <div class="sector-done-lane">
+                                <div class="worker-title">✅ Concluído</div>
+                                <div class="column-content" data-board="main" data-fase="Concluído Setor" data-setor="Tubistas" data-operador="Qualquer"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="sub-sector">
+                        <div class="sub-sector-title">🛠 SERRALHEIROS</div>
+                        <div class="sub-sector-grid">
+                            <div class="worker-lane">
+                                <div class="worker-title">Jenifer</div>
+                                <div class="zone-title" style="background:#e0e7ff; color:#3730a3;">Em Execução</div>
+                                <div class="column-content" data-board="main" data-fase="Produção" data-setor="Serralheiros" data-operador="Jenifer"></div>
+                                <div class="zone-title">Em Fila</div>
+                                <div class="column-content" data-board="main" data-fase="Em Fila" data-setor="Serralheiros" data-operador="Jenifer"></div>
+                                <div class="zone-title">Pendente</div>
+                                <div class="column-content" data-board="main" data-fase="Pendente" data-setor="Serralheiros" data-operador="Jenifer"></div>
+                            </div>
+                            <div class="worker-lane">
+                                <div class="worker-title">Douglas</div>
+                                <div class="zone-title" style="background:#e0e7ff; color:#3730a3;">Em Execução</div>
+                                <div class="column-content" data-board="main" data-fase="Produção" data-setor="Serralheiros" data-operador="Douglas"></div>
+                                <div class="zone-title">Em Fila</div>
+                                <div class="column-content" data-board="main" data-fase="Em Fila" data-setor="Serralheiros" data-operador="Douglas"></div>
+                                <div class="zone-title">Pendente</div>
+                                <div class="column-content" data-board="main" data-fase="Pendente" data-setor="Serralheiros" data-operador="Douglas"></div>
+                            </div>
+                            <div class="worker-lane">
+                                <div class="worker-title">Neto</div>
+                                <div class="zone-title" style="background:#e0e7ff; color:#3730a3;">Em Execução</div>
+                                <div class="column-content" data-board="main" data-fase="Produção" data-setor="Serralheiros" data-operador="Neto"></div>
+                                <div class="zone-title">Em Fila</div>
+                                <div class="column-content" data-board="main" data-fase="Em Fila" data-setor="Serralheiros" data-operador="Neto"></div>
+                                <div class="zone-title">Pendente</div>
+                                <div class="column-content" data-board="main" data-fase="Pendente" data-setor="Serralheiros" data-operador="Neto"></div>
+                            </div>
+                            <div class="sector-done-lane">
+                                <div class="worker-title">✅ Concluído</div>
+                                <div class="column-content" data-board="main" data-fase="Concluído Setor" data-setor="Serralheiros" data-operador="Qualquer"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="sub-sector">
+                        <div class="sub-sector-title">🔥 SOLDADORES</div>
+                        <div class="sub-sector-grid">
+                            <div class="worker-lane">
+                                <div class="worker-title">Alexandre</div>
+                                <div class="zone-title" style="background:#e0e7ff; color:#3730a3;">Em Execução</div>
+                                <div class="column-content" data-board="main" data-fase="Produção" data-setor="Soldadores" data-operador="Alexandre"></div>
+                                <div class="zone-title">Em Fila</div>
+                                <div class="column-content" data-board="main" data-fase="Em Fila" data-setor="Soldadores" data-operador="Alexandre"></div>
+                                <div class="zone-title">Pendente</div>
+                                <div class="column-content" data-board="main" data-fase="Pendente" data-setor="Soldadores" data-operador="Alexandre"></div>
+                            </div>
+                            <div class="worker-lane">
+                                <div class="worker-title">Jorge</div>
+                                <div class="zone-title" style="background:#e0e7ff; color:#3730a3;">Em Execução</div>
+                                <div class="column-content" data-board="main" data-fase="Produção" data-setor="Soldadores" data-operador="Jorge"></div>
+                                <div class="zone-title">Em Fila</div>
+                                <div class="column-content" data-board="main" data-fase="Em Fila" data-setor="Soldadores" data-operador="Jorge"></div>
+                                <div class="zone-title">Pendente</div>
+                                <div class="column-content" data-board="main" data-fase="Pendente" data-setor="Soldadores" data-operador="Jorge"></div>
+                            </div>
+                            <div class="worker-lane">
+                                <div class="worker-title">Diogo</div>
+                                <div class="zone-title" style="background:#e0e7ff; color:#3730a3;">Em Execução</div>
+                                <div class="column-content" data-board="main" data-fase="Produção" data-setor="Soldadores" data-operador="Diogo"></div>
+                                <div class="zone-title">Em Fila</div>
+                                <div class="column-content" data-board="main" data-fase="Em Fila" data-setor="Soldadores" data-operador="Diogo"></div>
+                                <div class="zone-title">Pendente</div>
+                                <div class="column-content" data-board="main" data-fase="Pendente" data-setor="Soldadores" data-operador="Diogo"></div>
+                            </div>
+                            <div class="worker-lane">
+                                <div class="worker-title">Yaroslav</div>
+                                <div class="zone-title" style="background:#e0e7ff; color:#3730a3;">Em Execução</div>
+                                <div class="column-content" data-board="main" data-fase="Produção" data-setor="Soldadores" data-operador="Yaroslav"></div>
+                                <div class="zone-title">Em Fila</div>
+                                <div class="column-content" data-board="main" data-fase="Em Fila" data-setor="Soldadores" data-operador="Yaroslav"></div>
+                                <div class="zone-title">Pendente</div>
+                                <div class="column-content" data-board="main" data-fase="Pendente" data-setor="Soldadores" data-operador="Yaroslav"></div>
+                            </div>
+                            <div class="worker-lane">
+                                <div class="worker-title">Luís</div>
+                                <div class="zone-title" style="background:#e0e7ff; color:#3730a3;">Em Execução</div>
+                                <div class="column-content" data-board="main" data-fase="Produção" data-setor="Soldadores" data-operador="Luís"></div>
+                                <div class="zone-title">Em Fila</div>
+                                <div class="column-content" data-board="main" data-fase="Em Fila" data-setor="Soldadores" data-operador="Luís"></div>
+                                <div class="zone-title">Pendente</div>
+                                <div class="column-content" data-board="main" data-fase="Pendente" data-setor="Soldadores" data-operador="Luís"></div>
+                            </div>
+                            <div class="sector-done-lane">
+                                <div class="worker-title">✅ Concluído</div>
+                                <div class="column-content" data-board="main" data-fase="Concluído Setor" data-setor="Soldadores" data-operador="Qualquer"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="sub-sector">
+                        <div class="sub-sector-title">🤖 ORBITAL</div>
+                        <div class="sub-sector-grid">
+                            <div class="worker-lane">
+                                <div class="worker-title">Oleh</div>
+                                <div class="zone-title" style="background:#e0e7ff; color:#3730a3;">Em Execução</div>
+                                <div class="column-content" data-board="main" data-fase="Produção" data-setor="Orbital" data-operador="Oleh"></div>
+                                <div class="zone-title">Em Fila</div>
+                                <div class="column-content" data-board="main" data-fase="Em Fila" data-setor="Orbital" data-operador="Oleh"></div>
+                                <div class="zone-title">Pendente</div>
+                                <div class="column-content" data-board="main" data-fase="Pendente" data-setor="Orbital" data-operador="Oleh"></div>
+                            </div>
+                            <div class="sector-done-lane">
+                                <div class="worker-title">✅ Concluído</div>
+                                <div class="column-content" data-board="main" data-fase="Concluído Setor" data-setor="Orbital" data-operador="Qualquer"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- QUALIDADE E TRATAMENTO -->
+            <div class="column" style="min-width: 200px; width: 200px;">
+                <div class="column-header">Qualidade (Ismael)</div>
+                <div class="worker-lane" style="margin: 6px; flex-grow: 1; border:none; background:transparent;">
+                    <div class="zone-title" style="background:#e0e7ff; color:#3730a3;">Em Execução</div>
+                    <div class="column-content" style="border: 1px solid var(--border-color); border-radius:4px; background:var(--bg-card); margin-bottom:5px;" data-board="main" data-fase="Qualidade" data-operador="Ismael"></div>
+                    <div class="zone-title">Em Fila</div>
+                    <div class="column-content" style="border: 1px solid var(--border-color); border-radius:4px; background:var(--bg-card); margin-bottom:5px;" data-board="main" data-fase="Em Fila" data-setor="Qualidade" data-operador="Ismael"></div>
+                    <div class="zone-title">Pendente</div>
+                    <div class="column-content" style="border: 1px solid var(--border-color); border-radius:4px; background:var(--bg-card);" data-board="main" data-fase="Pendente" data-setor="Qualidade" data-operador="Ismael"></div>
+                </div>
+            </div>
+            
+            <div class="column" style="min-width: 200px; width: 200px;">
+                <div class="column-header">Tratamento (Igor)</div>
+                <div class="worker-lane" style="margin: 6px; flex-grow: 1; border:none; background:transparent;">
+                    <div class="zone-title" style="background:#e0e7ff; color:#3730a3;">Em Execução</div>
+                    <div class="column-content" style="border: 1px solid var(--border-color); border-radius:4px; background:var(--bg-card); margin-bottom:5px;" data-board="main" data-fase="Tratamento" data-operador="Igor"></div>
+                    <div class="zone-title">Em Fila</div>
+                    <div class="column-content" style="border: 1px solid var(--border-color); border-radius:4px; background:var(--bg-card); margin-bottom:5px;" data-board="main" data-fase="Em Fila" data-setor="Tratamento" data-operador="Igor"></div>
+                    <div class="zone-title">Pendente</div>
+                    <div class="column-content" style="border: 1px solid var(--border-color); border-radius:4px; background:var(--bg-card);" data-board="main" data-fase="Pendente" data-setor="Tratamento" data-operador="Igor"></div>
+                </div>
+            </div>
+
+            <div class="column" style="min-width: 200px; width: 200px;">
+                <div class="column-header">Concluído Final</div>
+                <div class="column-content" data-board="main" data-fase="Concluído"></div>
+            </div>
+            
+        </div>
+    </div>
+
+    <!-- PÁGINA: DEPARTAMENTO DE FURAÇÃO E CORTE -->
+    <div id="page-laser" class="page">
+        <h2 style="color: #ef5350; margin-top: 0;">⚙️ Departamento de Furação e Corte</h2>
+        
+        <div class="search-container" style="border-color: #ef5350;">
+            <p style="font-size: 12px; color: #ef5350; margin-top: 0; margin-bottom: 8px;">
+                * Apenas são exibidas obras que a Produção enviou para este departamento.
+            </p>
+            <input type="text" id="laser-search-input" class="search-input-large" placeholder="🔎 Pesquisar Peça no Departamento..." onkeyup="renderizarKanbanComFiltro()">
+        </div>
+
+        <div class="board" id="boardLaser">
+            <!-- TRIAGEM INICIAL DO DEPARTAMENTO -->
+            <div class="column" style="min-width: 250px; width: 250px; border-top: 4px solid #94a3b8; background: #f8fafc;">
+                <div class="column-header" style="color: #64748b; font-size:11px;">📥 TRIAGEM / AGUARDAR CHAPA</div>
+                <div class="column-content" data-board="laser" data-fase="Furação e Corte" data-setor="Aguardar Chapa"></div>
+            </div>
+            
+            <!-- SECÇÃO LASER -->
+            <div class="column production-col" style="border-top: 4px solid #ef5350;">
+                <div class="column-header" style="color: #ef5350;">🔥 LASER</div>
+                <div class="sub-sectors-container">
+                    <div class="sub-sector">
+                        <div class="sub-sector-title" style="color:#64748b;">INOX</div>
+                        <div class="sub-sector-grid">
+                            <div class="worker-lane">
+                                <div class="zone-title" style="background:#e0e7ff; color:#3730a3;">Em Execução</div>
+                                <div class="column-content" data-board="laser" data-fase="Furação e Corte" data-setor="Laser-Inox-Execucao"></div>
+                                <div class="zone-title">Em Espera</div>
+                                <div class="column-content" data-board="laser" data-fase="Furação e Corte" data-setor="Laser-Inox-Espera"></div>
+                                <div class="zone-title" style="background:#e8f5e9; color:#1b5e20;">Concluído Setor</div>
+                                <div class="column-content" data-board="laser" data-fase="Furação e Corte" data-setor="Laser-Inox-Concluido"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="sub-sector">
+                        <div class="sub-sector-title" style="color:#333;">AÇO CARBONO</div>
+                        <div class="sub-sector-grid">
+                            <div class="worker-lane">
+                                <div class="zone-title" style="background:#e0e7ff; color:#3730a3;">Em Execução</div>
+                                <div class="column-content" data-board="laser" data-fase="Furação e Corte" data-setor="Laser-Carbono-Execucao"></div>
+                                <div class="zone-title">Em Espera</div>
+                                <div class="column-content" data-board="laser" data-fase="Furação e Corte" data-setor="Laser-Carbono-Espera"></div>
+                                <div class="zone-title" style="background:#e8f5e9; color:#1b5e20;">Concluído Setor</div>
+                                <div class="column-content" data-board="laser" data-fase="Furação e Corte" data-setor="Laser-Carbono-Concluido"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="sub-sector">
+                        <div class="sub-sector-title" style="color:#f57c00;">OUTROS MAT.</div>
+                        <div class="sub-sector-grid">
+                            <div class="worker-lane">
+                                <div class="zone-title" style="background:#e0e7ff; color:#3730a3;">Em Execução</div>
+                                <div class="column-content" data-board="laser" data-fase="Furação e Corte" data-setor="Laser-Outros-Execucao"></div>
+                                <div class="zone-title">Em Espera</div>
+                                <div class="column-content" data-board="laser" data-fase="Furação e Corte" data-setor="Laser-Outros-Espera"></div>
+                                <div class="zone-title" style="background:#e8f5e9; color:#1b5e20;">Concluído Setor</div>
+                                <div class="column-content" data-board="laser" data-fase="Furação e Corte" data-setor="Laser-Outros-Concluido"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECÇÃO TORNOS -->
+            <div class="column production-col" style="border-top: 4px solid #0097A7;">
+                <div class="column-header" style="color: #00796B;">⚙️ TORNOS</div>
+                <div class="sub-sectors-container">
+                    <div class="sub-sector">
+                        <div class="sub-sector-title" style="color:#64748b;">INOX</div>
+                        <div class="sub-sector-grid">
+                            <div class="worker-lane">
+                                <div class="zone-title" style="background:#e0e7ff; color:#3730a3;">Em Execução</div>
+                                <div class="column-content" data-board="laser" data-fase="Furação e Corte" data-setor="Torno-Inox-Execucao"></div>
+                                <div class="zone-title">Em Espera</div>
+                                <div class="column-content" data-board="laser" data-fase="Furação e Corte" data-setor="Torno-Inox-Espera"></div>
+                                <div class="zone-title" style="background:#e8f5e9; color:#1b5e20;">Concluído Setor</div>
+                                <div class="column-content" data-board="laser" data-fase="Furação e Corte" data-setor="Torno-Inox-Concluido"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="sub-sector">
+                        <div class="sub-sector-title" style="color:#333;">AÇO CARBONO</div>
+                        <div class="sub-sector-grid">
+                            <div class="worker-lane">
+                                <div class="zone-title" style="background:#e0e7ff; color:#3730a3;">Em Execução</div>
+                                <div class="column-content" data-board="laser" data-fase="Furação e Corte" data-setor="Torno-Carbono-Execucao"></div>
+                                <div class="zone-title">Em Espera</div>
+                                <div class="column-content" data-board="laser" data-fase="Furação e Corte" data-setor="Torno-Carbono-Espera"></div>
+                                <div class="zone-title" style="background:#e8f5e9; color:#1b5e20;">Concluído Setor</div>
+                                <div class="column-content" data-board="laser" data-fase="Furação e Corte" data-setor="Torno-Carbono-Concluido"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="sub-sector">
+                        <div class="sub-sector-title" style="color:#f57c00;">OUTROS MAT.</div>
+                        <div class="sub-sector-grid">
+                            <div class="worker-lane">
+                                <div class="zone-title" style="background:#e0e7ff; color:#3730a3;">Em Execução</div>
+                                <div class="column-content" data-board="laser" data-fase="Furação e Corte" data-setor="Torno-Outros-Execucao"></div>
+                                <div class="zone-title">Em Espera</div>
+                                <div class="column-content" data-board="laser" data-fase="Furação e Corte" data-setor="Torno-Outros-Espera"></div>
+                                <div class="zone-title" style="background:#e8f5e9; color:#1b5e20;">Concluído Setor</div>
+                                <div class="column-content" data-board="laser" data-fase="Furação e Corte" data-setor="Torno-Outros-Concluido"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECÇÃO QUINAGEM -->
+            <div class="column production-col" style="border-top: 4px solid #fbc02d;">
+                <div class="column-header" style="color: #f57f17;">📐 QUINAGEM</div>
+                <div class="sub-sectors-container">
+                    <div class="sub-sector">
+                        <div class="sub-sector-title" style="color:#64748b;">INOX</div>
+                        <div class="sub-sector-grid">
+                            <div class="worker-lane">
+                                <div class="zone-title" style="background:#e0e7ff; color:#3730a3;">Em Execução</div>
+                                <div class="column-content" data-board="laser" data-fase="Furação e Corte" data-setor="Quinagem-Inox-Execucao"></div>
+                                <div class="zone-title">Em Espera</div>
+                                <div class="column-content" data-board="laser" data-fase="Furação e Corte" data-setor="Quinagem-Inox-Espera"></div>
+                                <div class="zone-title" style="background:#e8f5e9; color:#1b5e20;">Concluído Setor</div>
+                                <div class="column-content" data-board="laser" data-fase="Furação e Corte" data-setor="Quinagem-Inox-Concluido"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="sub-sector">
+                        <div class="sub-sector-title" style="color:#333;">AÇO CARBONO</div>
+                        <div class="sub-sector-grid">
+                            <div class="worker-lane">
+                                <div class="zone-title" style="background:#e0e7ff; color:#3730a3;">Em Execução</div>
+                                <div class="column-content" data-board="laser" data-fase="Furação e Corte" data-setor="Quinagem-Carbono-Execucao"></div>
+                                <div class="zone-title">Em Espera</div>
+                                <div class="column-content" data-board="laser" data-fase="Furação e Corte" data-setor="Quinagem-Carbono-Espera"></div>
+                                <div class="zone-title" style="background:#e8f5e9; color:#1b5e20;">Concluído Setor</div>
+                                <div class="column-content" data-board="laser" data-fase="Furação e Corte" data-setor="Quinagem-Carbono-Concluido"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="sub-sector">
+                        <div class="sub-sector-title" style="color:#f57c00;">OUTROS MAT.</div>
+                        <div class="sub-sector-grid">
+                            <div class="worker-lane">
+                                <div class="zone-title" style="background:#e0e7ff; color:#3730a3;">Em Execução</div>
+                                <div class="column-content" data-board="laser" data-fase="Furação e Corte" data-setor="Quinagem-Outros-Execucao"></div>
+                                <div class="zone-title">Em Espera</div>
+                                <div class="column-content" data-board="laser" data-fase="Furação e Corte" data-setor="Quinagem-Outros-Espera"></div>
+                                <div class="zone-title" style="background:#e8f5e9; color:#1b5e20;">Concluído Setor</div>
+                                <div class="column-content" data-board="laser" data-fase="Furação e Corte" data-setor="Quinagem-Outros-Concluido"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CONCLUSÃO DO DEPARTAMENTO DE CORTE -->
+            <div class="column" style="min-width: 250px; width: 250px; border: 3px dashed #2e7d32; background: #e8f5e9;">
+                <div class="column-header" style="color: #1b5e20;">✅ CONCLUÍDO <br><span style="font-size:9px;">(ENVIAR PARA PRODUÇÃO)</span></div>
+                <div class="column-content" data-board="laser" data-fase="Pronto a Iniciar" data-setor="Geral"></div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- PÁGINA: CONSULTAS -->
+    <div id="page-consultas" class="page">
+        <h2>🔍 Consultar Obras & Operadores</h2>
+        <div class="add-form" style="display: flex;">
+            <input type="text" id="search-query" placeholder="Escreva o código da obra (ex: HY25003)..." onkeyup="filtrarConsultas()" style="flex-grow: 1;">
+            <button class="btn-action" style="background-color: #475569 !important; white-space: nowrap;" onclick="document.getElementById('search-query').value='Arquivado'; filtrarConsultas();">🗄️ Ver Obras Concluídas (Arquivo)</button>
+        </div>
+        <div id="consulta-results">
+            <p style="color: var(--text-secondary); text-align: center; margin-top: 30px;">
+                Digite algo no campo acima para listar o histórico e o trabalho em curso.
+            </p>
+        </div>
+    </div>
+
+    <!-- PÁGINA: KPIS E MÉTRICAS -->
+    <div id="page-kpis" class="page">
+        <h2 style="margin-top:0; color:var(--text-main);">📊 Estado Atual da Fábrica (Tempo Real)</h2>
+        <div class="kpi-grid">
+            <div class="kpi-card" style="border-left-color: #0288d1;">
+                <div class="kpi-title" style="color: #01579b;">Em Execução (Produção)</div>
+                <div class="kpi-value" id="kpi-em-execucao">0.0 Kg <span class="kpi-subtitle">(0 Peças)</span></div>
+            </div>
+            <div class="kpi-card" style="border-left-color: #8e24aa;">
+                <div class="kpi-title" style="color: #4a148c;">Em Fila (Preparação)</div>
+                <div class="kpi-value" id="kpi-em-fila">0.0 Kg <span class="kpi-subtitle">(0 Peças)</span></div>
+            </div>
+            <div class="kpi-card" style="border-left-color: #fbc02d;">
+                <div class="kpi-title" style="color: #f57f17;">Pendentes (Produção)</div>
+                <div class="kpi-value" id="kpi-pendentes">0.0 Kg <span class="kpi-subtitle">(0 Peças)</span></div>
+            </div>
+            <div class="kpi-card" style="border-left-color: #2e7d32;">
+                <div class="kpi-title" style="color: #1b5e20;">Concluído Final</div>
+                <div class="kpi-value" id="kpi-concluido-final">0.0 Kg <span class="kpi-subtitle">(0 Peças)</span></div>
+            </div>
+        </div>
+
+        <h2 style="color:var(--text-main);">⏱️ Distribuição por Categoria (Ativas)</h2>
+        <div class="kpi-grid">
+            <!-- Prioridade Máxima -->
+            <div class="kpi-card" style="border-left-color: #ef5350;">
+                <div class="kpi-title" style="color: #ef5350;">Prioridade Máxima (Vermelho)</div>
+                <div class="kpi-value" id="kpi-max-unid">0 Unid</div>
+                <div style="font-size: 13px; color: var(--text-secondary); margin-top: 4px;" id="kpi-max-detalhes">⚖️ 0.0 Kg | 📏 0.0"</div>
+                <div class="kpi-value-highlight" id="kpi-max-horas">⏱️ 0.0 Horas</div>
+            </div>
+            <!-- Requisições Internas (Laranja) -->
+            <div class="kpi-card" style="border-left-color: #ff9800;">
+                <div class="kpi-title" style="color: #ff9800;">Requisições Internas (Laranja)</div>
+                <div class="kpi-value" id="kpi-req-interna">0 Unid</div>
+                <div style="font-size: 13px; color: var(--text-secondary); margin-top: 4px;" id="kpi-req-interna-detalhes">⚖️ 0.0 Kg | 📏 0.0"</div>
+                <div class="kpi-value-highlight" id="kpi-req-interna-horas">⏱️ 0.0 Horas</div>
+            </div>
+            <!-- Pintura Externa (Amarelo) -->
+            <div class="kpi-card" style="border-left-color: #fbc02d;">
+                <div class="kpi-title" style="color: #fbc02d;">Pintura Externa (Amarelo)</div>
+                <div class="kpi-value" id="kpi-pintura-unid">0 Unid</div>
+                <div style="font-size: 13px; color: var(--text-secondary); margin-top: 4px;" id="kpi-pintura-detalhes">⚖️ 0.0 Kg | 📏 0.0"</div>
+                <div class="kpi-value-highlight" id="kpi-pintura-horas">⏱️ 0.0 Horas</div>
+            </div>
+            <!-- Normal -->
+            <div class="kpi-card" style="border-left-color: #cbd5e1;">
+                <div class="kpi-title" style="color: #64748b;">Normal (Sem Destaque)</div>
+                <div class="kpi-value" id="kpi-normal-unid">0 Unid</div>
+                <div style="font-size: 13px; color: var(--text-secondary); margin-top: 4px;" id="kpi-normal-detalhes">⚖️ 0.0 Kg | 📏 0.0"</div>
+                <div class="kpi-value-highlight" id="kpi-normal-horas">⏱️ 0.0 Horas</div>
+            </div>
+            <!-- Raio X -->
+            <div class="kpi-card" style="border-left-color: #9c27b0;">
+                <div class="kpi-title" style="color: #9c27b0;">Raio X (Roxo)</div>
+                <div class="kpi-value" id="kpi-raiox-unid">0 Unid</div>
+                <div style="font-size: 13px; color: var(--text-secondary); margin-top: 4px;" id="kpi-raiox-detalhes">⚖️ 0.0 Kg | 📏 0.0"</div>
+                <div class="kpi-value-highlight" id="kpi-raiox-horas">⏱️ 0.0 Horas</div>
+            </div>
+            <!-- Retrabalho -->
+            <div class="kpi-card" style="border-left-color: #94a3b8;">
+                <div class="kpi-title" style="color: #94a3b8;">Retrabalho (Cinzento)</div>
+                <div class="kpi-value" id="kpi-retrabalho-unid">0 Unid</div>
+                <div style="font-size: 13px; color: var(--text-secondary); margin-top: 4px;" id="kpi-retrabalho-detalhes">⚖️ 0.0 Kg | 📏 0.0"</div>
+                <div class="kpi-value-highlight" id="kpi-retrabalho-horas">⏱️ 0.0 Horas</div>
+            </div>
+        </div>
+
+        <h2 style="color:var(--text-main);">📈 Histórico e Produção Global</h2>
+        <div class="kpi-grid">
+            <div class="kpi-card" style="border-left-color: #94a3b8;">
+                <div class="kpi-title" style="color: #64748b;">Taxa de Retrabalho Global</div>
+                <div class="kpi-value" id="kpi-retrabalho-geral">0 Unid <span class="kpi-subtitle">(0.0% Taxa Final)</span></div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-title">Kg Soldados (Acumulado Total)</div>
+                <div class="kpi-value" id="kpi-tons-ano">0.0 Kg</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-title">Kg Soldados (Semana)</div>
+                <div class="kpi-value" id="kpi-tons-semana"><span style="font-size:14px; color:#94a3b8;">Requer Registo de Datas</span></div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-title">Kg Soldados (Mês)</div>
+                <div class="kpi-value" id="kpi-tons-mes"><span style="font-size:14px; color:#94a3b8;">Requer Registo de Datas</span></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PÁGINA: NOVO MÓDULO BRIEFING DIÁRIO -->
+    <div id="page-briefing" class="page">
+        
+        <div class="briefing-action-bar no-print">
+            <div>
+                <button class="btn-action" id="btn-sync-prod" style="background-color: #00bcd4 !important; color: #1e293b !important;" onclick="carregarBriefing()">📥 Sincronizar da Produção</button>
+                <button class="btn-action" id="btn-gravar-briefing" style="background-color: #ffeb3b !important; color: #1e293b !important; margin-left: 10px;" onclick="guardarBriefingNaBD()">💾 Gravar Alterações na Produção</button>
+            </div>
+            <div>
+                <button class="btn-action" style="background-color: #7cb342 !important;" onclick="exportarBriefingExcel()">📊 Exportar Excel</button>
+                <button class="btn-action" style="background-color: #455a64 !important; margin-left: 10px;" onclick="imprimirBriefing()">🖨️ Imprimir / PDF</button>
+            </div>
+        </div>
+
+        <div class="briefing-container">
+            <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 15px;">
+                <h2 style="color: #7cb342; margin: 0;" id="briefing-date-title">PLANO DIÁRIO</h2>
+                <span class="no-print" style="font-size: 11px; color: var(--text-secondary);">* Apenas mostra peças Em Execução, Em Fila ou Pendentes.</span>
+            </div>
+            
+            <textarea class="briefing-header-notes" id="briefing-notes" rows="4" placeholder="Anotações Gerais da Chefia (Ex: Direcionadas à produção; visitantes na instalação...)"></textarea>
+
+            <table class="briefing-table" id="briefing-table-export">
+                <thead>
+                    <tr>
+                        <th style="width: 15%;">Funcionário</th>
+                        <th style="width: 15%;">Obra</th>
+                        <th style="width: 55%;">Trabalho</th>
+                        <th style="width: 15%;">Estado</th>
+                    </tr>
+                </thead>
+                <tbody id="briefing-tbody">
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- MODAL DE CHECKPOINTS -->
+    <div id="backup-modal" class="modal-overlay">
+        <div class="modal">
+            <h3>🛡️ Central de Checkpoints</h3>
+            <p style="font-size:12px; color: var(--text-secondary);">Proteja a sua informação criando cópias de segurança locais do estado da fábrica.</p>
+            
+            <button class="btn-action" style="background-color: #2e7d32 !important; margin-top: 10px;" onclick="exportarExcelCheckPoint()">📊 Exportar Estado para Excel (Leitura)</button>
+            <button class="btn-action" style="background-color: #0288d1 !important; margin-top: 5px;" onclick="descarregarBackupJSON()">💾 Descarregar Backup de Sistema</button>
+            
+            <hr style="border: 0; border-top: 1px solid var(--border-color); width: 100%; margin: 15px 0;">
+            
+            <label style="color: #d32f2f; font-weight: bold; margin-bottom: 5px;">Recuperar Sistema (Em caso de erro Grave):</label>
+            <label class="btn-action" style="background-color: #d32f2f !important; text-align: center; cursor: pointer;">
+                ♻️ Restaurar Backup
+                <input type="file" id="restore-input" accept=".json" onchange="restaurarBackupJSON(event)" style="display:none;">
+            </label>
+
+            <button class="btn-card" style="padding: 8px 12px !important; margin-top: 10px; background: #555 !important; color: white !important; border-radius: 4px !important;" onclick="fecharMenuBackup()">Fechar Menu</button>
+        </div>
+    </div>
+
+    <!-- MODAL DE DATA -->
+    <div id="date-modal" class="modal-overlay">
+        <div class="modal">
+            <h3>📅 Data de Início da Obra</h3>
+            <p style="font-size: 13px; margin-top: 0; color: var(--text-secondary);">Defina a data de criação deste cartão / importação.</p>
+            
+            <label>Data:</label>
+            <input type="date" id="date-input-criacao">
+            
+            <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 15px;">
+                <button class="btn-card" style="padding: 6px 12px !important; background: #475569 !important; color: white !important; border-radius: 4px !important;" onclick="confirmarDataCriacao(true)">Usar Data de Hoje</button>
+                <button class="btn-action" onclick="confirmarDataCriacao(false)">Confirmar Data Selecionada</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE EDIÇÃO AVANÇADA -->
+    <div id="edit-modal" class="modal-overlay">
+        <div class="modal">
+            <h3>✏️ Editar Componente</h3>
+            <input type="hidden" id="edit-id">
+            <input type="hidden" id="edit-material-original">
+            
+            <label>Código da Obra Mãe (ex: HY25003):</label>
+            <input type="text" id="edit-obra">
+
+            <label>Designação do Componente / Peça:</label>
+            <input type="text" id="edit-ref">
+
+            <div style="display:flex; gap:10px;">
+                <div style="flex:1;">
+                    <label>Peso (Kg):</label>
+                    <input type="number" id="edit-kg" step="any" style="width:100%;">
+                </div>
+                <div style="flex:1;">
+                    <label>Pol ("):</label>
+                    <input type="number" id="edit-pol" step="any" style="width:100%;">
+                </div>
+                <div style="flex:1;">
+                    <label>Horas:</label>
+                    <input type="number" id="edit-horas" step="any" style="width:100%;">
+                </div>
+                <div style="flex:1;">
+                    <label>Material:</label>
+                    <input type="text" id="edit-material" placeholder="Ex: Inox" style="width:100%;">
+                </div>
+            </div>
+
+            <label style="margin-top: 5px;">Categoria / Prioridade:</label>
+            <select id="edit-prio">
+                <option value="Sem Cor">⚪ Sem Categoria (Branco)</option>
+                <option value="Vermelho">🔴 Prioridade Máxima</option>
+                <option value="Laranja">🟠 Requisição Interna</option>
+                <option value="Amarelo">🟡 Pintura Externa</option>
+                <option value="Normal">🔵 Normal</option>
+                <option value="Raio X">🟣 Raio X</option>
+                <option value="Retrabalho">🔘 Retrabalho</option>
+            </select>
+
+            <div style="display:flex; gap:10px; margin-top: 5px;">
+                <div style="flex:1;">
+                    <label>Data da Obra:</label>
+                    <input type="date" id="edit-date" style="width:100%;">
+                </div>
+                <div style="flex:1;">
+                    <label>Adicionar Pessoa/Fase ao Rastreio:</label>
+                    <input type="hidden" id="edit-rastreio-current">
+                    <input type="text" id="edit-rastreio-add" placeholder="Ex: Manuel e José" style="width:100%;">
+                </div>
+            </div>
+            
+            <div id="current-rastreio-display" style="font-size: 10px; color: var(--text-secondary); margin-top: 2px; text-align: right; min-height: 12px;"></div>
+
+            <label style="margin-top:10px;">Comentários / Observações (Use 'Enter' para criar Bullets):</label>
+            <textarea id="edit-comments" rows="3" placeholder="Escreva observações sobre o progresso..."></textarea>
+
+            <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 10px;">
+                <button class="btn-card" style="padding: 6px 12px !important; color: white !important; background: #555 !important; border-radius: 4px !important;" onclick="fecharModal()">Cancelar</button>
+                <button class="btn-action" onclick="verificarESalvarEdicao()">Guardar Alterações</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE DETALHES DA PEÇA -->
+    <div id="details-modal" class="modal-overlay">
+        <div class="modal" style="width: 500px;">
+            <div class="details-header">
+                <div>
+                    <div class="details-badge" id="details-badge">HY25000</div>
+                    <div class="details-title" id="details-title">Referência da Peça</div>
+                </div>
+                <button class="btn-card" style="font-size: 16px !important; background: #e2e8f0 !important; padding: 4px 8px !important; border-radius: 4px !important;" onclick="fecharDetalhes()">✖</button>
+            </div>
+            
+            <div style="display: flex; gap: 10px; margin-bottom: 5px;">
+                <div class="details-section" style="flex: 1;">
+                    <div class="details-section-title">📊 Dados de Produção</div>
+                    <div style="font-size: 12px; line-height: 1.6;">
+                        <div><b>Data Criação:</b> <span id="details-date">N/A</span></div>
+                        <div><b>Prioridade:</b> <span id="details-prio">Normal</span></div>
+                        <div><b>Peso:</b> <span id="details-kg">0</span> Kg</div>
+                        <div><b>Tamanho:</b> <span id="details-pol">0</span>"</div>
+                        <div><b>Tempo Execução:</b> <span id="details-horas">0</span>h</div>
+                        <div><b>Material:</b> <span id="details-material">N/A</span></div>
+                    </div>
+                </div>
+                
+                <div class="details-section" style="flex: 1; background: #f8fafc;">
+                    <div class="details-section-title">📍 Rastreabilidade</div>
+                    <div class="details-timeline" id="details-timeline">
+                    </div>
+                </div>
+            </div>
+
+            <div class="details-section">
+                <div class="details-section-title">💬 Observações e Comentários</div>
+                <ul class="details-comments-list" id="details-comments">
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- CAIXAS DE ALERTA E CONFIRMAÇÃO -->
+    <div id="custom-alert" class="modal-overlay">
+        <div class="modal" style="width: 320px; text-align: center; align-items: center;">
+            <h3 style="margin-bottom: 10px;">Sistema PRF</h3>
+            <p id="custom-alert-msg" style="font-size: 14px; margin-bottom: 20px; color: var(--text-main);"></p>
+            <button class="btn-action" style="width: 100%; justify-content: center;" onclick="fecharAlerta()">OK</button>
+        </div>
+    </div>
+
+    <div id="custom-confirm" class="modal-overlay">
+        <div class="modal" style="width: 320px; text-align: center;">
+            <h3 style="margin-bottom: 10px;">Atenção</h3>
+            <p id="custom-confirm-msg" style="font-size: 14px; margin-bottom: 20px; color: var(--text-main);"></p>
+            <div style="display: flex; gap: 10px; justify-content: center;">
+                <button class="btn-card" style="padding: 8px 15px !important; background: #555 !important; color: white !important; border-radius: 4px !important;" onclick="fecharConfirmacao()">Cancelar</button>
+                <button class="btn-action" style="background-color: #d32f2f !important;" id="btn-confirm-yes">Confirmar</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // =====================================================
+        // FUNÇÕES DE SEGURANÇA E FORMATAÇÃO
+        // =====================================================
+        
+        function sanitizeForDB(str) {
+            if (!str) return '';
+            return String(str).replace(/[\u0000-\u0008\u000B-\u000C\u000E-\u001F\u007F-\u009F]/g, "").replace(/\\/g, "/").trim();
+        }
+
+        function escapeHTML(str) {
+            if (str === null || str === undefined) return '';
+            return String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+        }
+
+        function removerAcentos(str) {
+            if (!str) return '';
+            return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+        }
+
+        function dataHojeStr() {
+            const today = new Date();
+            const yyyy = today.getFullYear();
+            let mm = today.getMonth() + 1; 
+            let dd = today.getDate();
+            if (dd < 10) dd = '0' + dd;
+            if (mm < 10) mm = '0' + mm;
+            return yyyy + '-' + mm + '-' + dd;
+        }
+
+        function formatarDataVisivel(dataStr) {
+            if (!dataStr) return '';
+            const datePart = String(dataStr).split('T')[0].split(' ')[0];
+            const partes = datePart.split('-');
+            if (partes.length === 3) return `${partes[2]}/${partes[1]}/${partes[0]}`;
+            return dataStr;
+        }
+
+        // =====================================================
+        // LIGAÇÃO SUPABASE
+        // =====================================================
+        const supabaseUrl = 'https://hybquplraoiarwfwxiwn.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh5YnF1cGxyYW9pYXJ3Znd4aXduIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkzMDYwMDgsImV4cCI6MjEwNDg4MjAwOH0.1EFqdshaIQJU96rMr8ep9ED6HAkAmmrfz_dTxGN4Hi8';
+        const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
+
+        let todasAsObras = [];
+        let operacaoPendenteData = null; 
+
+        // VARIÁVEIS DE SISTEMA (AUTENTICAÇÃO E PERFIS)
+        let currentUserEmail = null;
+        let currentUserRole = 'Admin'; 
+
+        // =====================================================
+        // SISTEMA DE LOGIN E SESSÃO
+        // =====================================================
+        async function inicializarApp() {
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            if (session) {
+                await configurarSessao(session.user.email);
+            } else {
+                document.getElementById('login-screen').style.display = 'flex';
+            }
+        }
+
+        async function fazerLogin() {
+            const email = document.getElementById('login-email').value;
+            const pass = document.getElementById('login-password').value;
+            
+            mostrarAlerta("A verificar credenciais...");
+            const { data, error } = await supabaseClient.auth.signInWithPassword({ email: email, password: pass });
+            fecharAlerta();
+
+            if (error) {
+                mostrarAlerta("Erro no Login: " + error.message);
+            } else {
+                document.getElementById('login-screen').style.display = 'none';
+                await configurarSessao(data.user.email);
+            }
+        }
+
+        async function configurarSessao(email) {
+            currentUserEmail = email;
+            
+            const { data, error } = await supabaseClient.from('perfis_acesso').select('perfil').eq('email', email).single();
+            
+            if (data && data.perfil) {
+                currentUserRole = data.perfil;
+            } else {
+                currentUserRole = 'Visualizador'; 
+            }
+
+            aplicarRestricoesVisuais();
+            carregarTudo();
+        }
+
+        function aplicarRestricoesVisuais() {
+            const headerName = document.getElementById('header-user-name');
+            if(headerName) headerName.innerText = `👤 ${currentUserEmail} (${currentUserRole})`;
+
+            if (currentUserRole === 'Visualizador') {
+                const adminAddForm = document.getElementById('admin-add-form');
+                if(adminAddForm) adminAddForm.style.display = 'none';
+                
+                const adminActionsBar = document.getElementById('admin-actions-bar');
+                if(adminActionsBar) adminActionsBar.style.display = 'none';
+                
+                const btnSync = document.getElementById('btn-sync-prod');
+                const btnGravar = document.getElementById('btn-gravar-briefing');
+                if(btnSync) btnSync.style.display = 'none';
+                if(btnGravar) btnGravar.style.display = 'none';
+                
+                const notes = document.getElementById('briefing-notes');
+                if(notes) notes.setAttribute('readonly', 'true');
+            }
+        }
+
+        async function fazerLogout() {
+            await supabaseClient.auth.signOut();
+            location.reload();
+        }
+
+        // -----------------------------------------------------
+        // SCROLL SINCRONIZADO E MÁGICO
+        // -----------------------------------------------------
+        const topScrollWrapper = document.getElementById('topScrollWrapper');
+        const boardKanban = document.getElementById('boardKanban');
+        
+        let isSyncingTop = false;
+        let isSyncingBottom = false;
+
+        topScrollWrapper.addEventListener('scroll', () => { 
+            if (!isSyncingTop) {
+                isSyncingBottom = true;
+                boardKanban.scrollLeft = topScrollWrapper.scrollLeft; 
+            }
+            isSyncingTop = false;
+        }, { passive: true });
+        
+        boardKanban.addEventListener('scroll', () => { 
+            if (!isSyncingBottom) {
+                isSyncingTop = true;
+                topScrollWrapper.scrollLeft = boardKanban.scrollLeft; 
+            }
+            isSyncingBottom = false;
+        }, { passive: true });
+        
+        function atualizarTamanhoScrollTopo() { 
+            document.getElementById('topScrollDummy').style.width = boardKanban.scrollWidth + 'px'; 
+        }
+        
+        window.addEventListener('resize', atualizarTamanhoScrollTopo);
+
+        document.addEventListener('dragover', function(e) {
+            if (currentUserRole === 'Visualizador') return; 
+            
+            const edgeSize = 150; 
+            const speed = 25; 
+            
+            const activePage = document.querySelector('.page.active').id;
+            const currentBoard = activePage === 'page-laser' ? document.getElementById('boardLaser') : document.getElementById('boardKanban');
+
+            if (!currentBoard) return;
+            
+            if (e.clientX > window.innerWidth - edgeSize) {
+                currentBoard.scrollLeft += speed;
+            } 
+            else if (e.clientX < edgeSize) {
+                currentBoard.scrollLeft -= speed;
+            }
+        });
+
+        // -----------------------------------------------------
+        // ALERTAS E NAVEGAÇÃO
+        // -----------------------------------------------------
+        function mostrarAlerta(mensagem) { 
+            document.getElementById('custom-alert-msg').innerText = mensagem; 
+            document.getElementById('custom-alert').classList.add('active'); 
+        }
+
+        function fecharAlerta() { 
+            document.getElementById('custom-alert').classList.remove('active'); 
+        }
+
+        function mostrarConfirmacao(mensagem, callbackSim) { 
+            document.getElementById('custom-confirm-msg').innerText = mensagem; 
+            document.getElementById('custom-confirm').classList.add('active'); 
+            
+            const btnSim = document.getElementById('btn-confirm-yes');
+            btnSim.onclick = function() { 
+                fecharConfirmacao(); 
+                callbackSim(); 
+            }; 
+        }
+
+        function fecharConfirmacao() { 
+            document.getElementById('custom-confirm').classList.remove('active'); 
+        }
+
+        function limparCacheERefresh() { 
+            if ('caches' in window) { 
+                caches.keys().then(names => { 
+                    names.forEach(name => caches.delete(name)); 
+                }); 
+            } 
+            window.location.href = window.location.pathname; 
+        }
+        
+        function navesPara(pageId) {
+            document.querySelectorAll('.page').forEach(p => {
+                p.classList.remove('active');
+            });
+            document.getElementById(pageId).classList.add('active');
+            
+            if (pageId === 'page-kpis') {
+                calcularKPIs();
+            }
+            if (pageId === 'page-briefing') {
+                carregarBriefing();
+            }
+            
+            renderizarKanbanComFiltro();
+            setTimeout(atualizarTamanhoScrollTopo, 100);
+        }
+
+        // -----------------------------------------------------
+        // NOVO MÓDULO: BRIEFING DIÁRIO
+        // -----------------------------------------------------
+        const trabalhadoresBriefing = ['Camila', 'José Henriques', 'Suellen', 'Oleh', 'Yaroslav', 'Luís Agostinho', 'Diogo Santos', 'Jorge Vieira', 'Pedro Santos', 'André', 'Alexandre', 'Jenifer', 'Neto', 'Igor', 'Douglas', 'Davi'];
+
+        function carregarBriefing() {
+            const tbody = document.getElementById('briefing-tbody');
+            let html = '';
+            
+            const hoje = new Date();
+            document.getElementById('briefing-date-title').innerText = `${hoje.getDate()}/${hoje.getMonth()+1} - PLANO DIÁRIO`;
+
+            const attrReadonly = currentUserRole === 'Visualizador' ? 'readonly' : '';
+
+            trabalhadoresBriefing.forEach(trab => {
+                const primeiroNome = removerAcentos(trab.split(' ')[0]);
+                
+                const obrasTrab = todasAsObras.filter(o => {
+                    const matchTrabalhador = o.trabalhador && removerAcentos(o.trabalhador).includes(primeiroNome);
+                    
+                    const f = String(o.fase || '');
+                    const s = String(o.setor || '');
+                    
+                    const isMainProducao = (f === 'Produção' || f === 'Em Fila' || f === 'Pendente');
+                    const isQualiTrat = (f === 'Qualidade' || f === 'Tratamento');
+                    
+                    const isCorteExecEspera = (f === 'Furação e Corte' || f === 'Laser') && (!s || s.includes('Execucao') || s.includes('Espera') || s === 'Aguardar Chapa');
+                    
+                    const isValidState = isMainProducao || isQualiTrat || isCorteExecEspera;
+
+                    return matchTrabalhador && isValidState;
+                });
+
+                if (obrasTrab.length > 0) {
+                    obrasTrab.forEach((o, index) => {
+                        let desc = o.referencia || '';
+                        if(o.comentarios && o.comentarios.trim() !== '') {
+                            desc += '\n' + o.comentarios;
+                        }
+                        
+                        html += `
+                        <tr data-card-id="${o.id}">
+                            ${index === 0 ? `<td rowspan="${obrasTrab.length}" style="background:#f4f6f8;"><b>${trab}</b></td>` : ''}
+                            <td><input type="text" class="briefing-input b-obra" value="${escapeHTML(o.obra_ref || '')}" readonly></td>
+                            <td><textarea class="briefing-input b-trab" rows="2" ${attrReadonly}>${escapeHTML(desc)}</textarea></td>
+                            <td><input type="text" class="briefing-input b-est estado-red" placeholder="" ${attrReadonly}></td>
+                        </tr>
+                        `;
+                    });
+                } else {
+                    html += `
+                    <tr data-worker="${trab}">
+                        <td style="background:#f4f6f8;"><b>${trab}</b></td>
+                        <td><input type="text" class="briefing-input" placeholder="..." ${attrReadonly}></td>
+                        <td><textarea class="briefing-input" rows="2" placeholder="Escrever tarefa..." ${attrReadonly}></textarea></td>
+                        <td><input type="text" class="briefing-input estado-red" placeholder="" ${attrReadonly}></td>
+                    </tr>
+                    `;
+                }
+            });
+
+            tbody.innerHTML = html;
+        }
+
+        async function guardarBriefingNaBD() {
+            if (currentUserRole === 'Visualizador') return;
+            mostrarAlerta("A sincronizar briefing com a Base de Dados...");
+            const rows = document.querySelectorAll('#briefing-tbody tr[data-card-id]');
+            let updates = [];
+            
+            rows.forEach(row => {
+                const id = row.getAttribute('data-card-id');
+                const text = row.querySelector('.b-trab').value;
+                updates.push({ id: id, comentarios: sanitizeForDB(text) });
+            });
+
+            for(let u of updates) {
+                await supabaseClient.from('cartoes_kanban').update({ comentarios: u.comentarios }).eq('id', u.id);
+            }
+            
+            mostrarAlerta("Sincronizado com sucesso!");
+            carregarTudo(); 
+        }
+
+        function imprimirBriefing() {
+            window.print();
+        }
+
+        function exportarBriefingExcel() {
+            const table = document.getElementById('briefing-table-export');
+            const ws = XLSX.utils.table_to_sheet(table);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Briefing");
+            XLSX.writeFile(wb, `Briefing_Producao_${dataHojeStr()}.xlsx`);
+        }
+
+        // -----------------------------------------------------
+        // CHECKPOINT 
+        // -----------------------------------------------------
+        function abrirMenuBackup() { 
+            document.getElementById('backup-modal').classList.add('active'); 
+        }
+
+        function fecharMenuBackup() { 
+            document.getElementById('backup-modal').classList.remove('active'); 
+        }
+
+        function exportarExcelCheckPoint() {
+            fecharMenuBackup(); 
+            mostrarAlerta("A gerar relatório Excel do estado atual da fábrica...");
+            
+            const dadosExcel = todasAsObras.map(o => {
+                const pesoFinal = o.kg !== undefined && o.kg !== null ? o.kg : (o.toneladas || 0);
+                
+                return {
+                    "Código Obra": o.obra_ref || "MANUAL", 
+                    "Designação": o.referencia, 
+                    "Fase Atual": o.fase, 
+                    "Setor": o.setor || "Geral",
+                    "Trabalhador": o.trabalhador,
+                    "Peso (Kg)": pesoFinal, 
+                    "Polegadas": o.polegadas || 0, 
+                    "Horas Execução": o.horas || 0,
+                    "Prioridade": o.prioridade || 'Normal', 
+                    "Material": o.material || '',
+                    "Comentários": o.comentarios || '',
+                    "Data Criacao": o.data_criacao || '',
+                    "Rastreio": o.rastreio || ''
+                };
+            });
+            
+            const ws = XLSX.utils.json_to_sheet(dadosExcel); 
+            const wb = XLSX.utils.book_new(); 
+            XLSX.utils.book_append_sheet(wb, ws, "Estado Fabrica");
+            
+            const dataHoje = new Date().toLocaleDateString('pt-PT').replace(/\//g, '-'); 
+            XLSX.writeFile(wb, `Checkpoint_PRF_${dataHoje}.xlsx`);
+        }
+
+        function descarregarBackupJSON() {
+            fecharMenuBackup(); 
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(todasAsObras));
+            const downloadAnchorNode = document.createElement('a'); 
+            
+            downloadAnchorNode.setAttribute("href", dataStr);
+            const dataHoje = new Date().toLocaleDateString('pt-PT').replace(/\//g, '-'); 
+            downloadAnchorNode.setAttribute("download", `Backup_Sistema_PRF_${dataHoje}.json`);
+            
+            document.body.appendChild(downloadAnchorNode); 
+            downloadAnchorNode.click(); 
+            downloadAnchorNode.remove();
+            
+            mostrarAlerta("Backup descarregado para o computador!");
+        }
+
+        function restaurarBackupJSON(event) {
+            fecharMenuBackup(); 
+            const file = event.target.files[0]; 
+            if (!file) {
+                return;
+            }
+
+            mostrarConfirmacao("⚠️ O restauro apaga o quadro atual e repõe as informações do ficheiro. Confirma?", async function() {
+                mostrarAlerta('A restaurar a Base de Dados...'); 
+                
+                const reader = new FileReader();
+                reader.onload = async function(e) {
+                    try {
+                        const backupData = JSON.parse(e.target.result);
+                        await supabaseClient.from('cartoes_kanban').delete().neq('fase', 'ZZZ');
+                        
+                        const lotesParaInserir = backupData.map(o => { 
+                            delete o.id; 
+                            return o; 
+                        });
+                        
+                        for (let i = 0; i < lotesParaInserir.length; i += 500) { 
+                            await supabaseClient.from('cartoes_kanban').insert(lotesParaInserir.slice(i, i + 500)); 
+                        }
+                        
+                        mostrarAlerta("♻️ Sistema restaurado com sucesso!"); 
+                        carregarTudo();
+                    } catch (err) { 
+                        mostrarAlerta("Erro ao restaurar backup: " + err.message); 
+                    }
+                }; 
+                reader.readAsText(file);
+            });
+        }
+
+        // -----------------------------------------------------
+        // LIMPEZAS GERAIS
+        // -----------------------------------------------------
+        function limparProjetos() { 
+            mostrarConfirmacao("Deseja LIMPAR os projetos não iniciados?", async function() { 
+                const { error } = await supabaseClient.from('cartoes_kanban').delete().eq('fase', 'Projeto'); 
+                if (error) {
+                    mostrarAlerta("Erro ao limpar projetos: " + error.message);
+                } else {
+                    carregarTudo(); 
+                }
+            }); 
+        }
+
+        function limparConcluidos() { 
+            mostrarConfirmacao("Deseja ARQUIVAR apenas as obras da coluna 'Concluído Final'?", async function() { 
+                const { error } = await supabaseClient.from('cartoes_kanban').update({ fase: 'Arquivado' }).eq('fase', 'Concluído'); 
+                if (error) {
+                    mostrarAlerta("Erro ao arquivar: " + error.message);
+                } else {
+                    mostrarAlerta("Obras da coluna Concluído Final foram enviadas para o Arquivo.");
+                    carregarTudo(); 
+                }
+            }); 
+        }
+
+        function apagarTudoBD() { 
+            mostrarConfirmacao("🚨 APAGAR TUDO DO QUADRO?", function() { 
+                setTimeout(() => { 
+                    mostrarConfirmacao("ÚLTIMO AVISO: ELIMINAR A BASE DE DADOS COMPLETA?", async function() { 
+                        const { error } = await supabaseClient.from('cartoes_kanban').delete().neq('fase', 'ZZZ'); 
+                        if (error) {
+                            mostrarAlerta("Erro fatal: " + error.message);
+                        } else {
+                            carregarTudo(); 
+                        }
+                    }); 
+                }, 300); 
+            }); 
+        }
+
+        // -----------------------------------------------------
+        // SISTEMA DE DATAS (MODAIS E CONFIRMAÇÃO)
+        // -----------------------------------------------------
+        function abrirModalData(operacaoStr) {
+            operacaoPendenteData = operacaoStr;
+            const dataInput = document.getElementById('date-input-criacao');
+            dataInput.value = dataHojeStr(); 
+            document.getElementById('date-modal').classList.add('active');
+        }
+
+        function confirmarDataCriacao(usarHoje) {
+            let dataEscolhida = '';
+            
+            if (usarHoje) {
+                dataEscolhida = dataHojeStr();
+            } else {
+                dataEscolhida = document.getElementById('date-input-criacao').value;
+                if (!dataEscolhida) {
+                    mostrarAlerta("Selecione uma data no calendário ou clique em 'Usar Data de Hoje'.");
+                    return;
+                }
+            }
+
+            document.getElementById('date-modal').classList.remove('active');
+
+            if (operacaoPendenteData === 'manual') {
+                executarAdicionarObra(dataEscolhida);
+            } else if (operacaoPendenteData === 'excel') {
+                executarImportacaoExcel(dataEscolhida);
+            }
+        }
+
+        function adicionarObraModalData() {
+            const ref = document.getElementById('new-ref').value.trim(); 
+            if (!ref) {
+                mostrarAlerta('Digite a referência do componente antes de adicionar!');
+                return;
+            }
+            abrirModalData('manual');
+        }
+
+        // -----------------------------------------------------
+        // ADICIONAR MANUAL
+        // -----------------------------------------------------
+        function parseNumeroSeguro(elementId) {
+            let el = document.getElementById(elementId);
+            if (!el) return 0;
+            let val = el.value.toString().trim().replace(',', '.'); 
+            let num = parseFloat(val);
+            if (isNaN(num)) return 0;
+            return num;
+        }
+
+        async function executarAdicionarObra(dataCriacaoStr) {
+            const ref = document.getElementById('new-ref').value.trim(); 
+            const prio = document.getElementById('new-prio').value;
+            const vKg = parseNumeroSeguro('new-kg');
+            const vPol = parseNumeroSeguro('new-pol');
+            const vHoras = parseNumeroSeguro('new-horas');
+            const mat = document.getElementById('new-material').value.trim();
+
+            const insertData = { 
+                obra_ref: 'MANUAL', 
+                referencia: sanitizeForDB(ref), 
+                kg: vKg, 
+                toneladas: vKg, 
+                polegadas: vPol, 
+                horas: vHoras,
+                prioridade: sanitizeForDB(prio), 
+                fase: 'Projeto', 
+                trabalhador: 'Não Atribuído',
+                data_criacao: dataCriacaoStr,
+                rastreio: '',
+                material: sanitizeForDB(mat)
+            };
+
+            let res = await supabaseClient.from('cartoes_kanban').insert([insertData]).select();
+
+            if (res.error) {
+                const fallbackData = { ...insertData };
+                delete fallbackData.kg;
+                delete fallbackData.polegadas;
+                delete fallbackData.horas;
+                delete fallbackData.data_criacao;
+                delete fallbackData.rastreio;
+                delete fallbackData.material;
+                
+                const fallbackRes = await supabaseClient.from('cartoes_kanban').insert([fallbackData]).select();
+                res = fallbackRes;
+            }
+
+            if (res.error) {
+                return mostrarAlerta('Erro crítico ao adicionar obra. Verifique SQL: ' + res.error.message);
+            }
+
+            if (res.data && res.data.length > 0) {
+                document.getElementById('new-ref').value = ''; 
+                document.getElementById('new-kg').value = ''; 
+                document.getElementById('new-pol').value = '';
+                document.getElementById('new-horas').value = '';
+                document.getElementById('new-material').value = ''; 
+                carregarTudo(); 
+            }
+        }
+
+        // -----------------------------------------------------
+        // IMPORTAR EXCEL
+        // -----------------------------------------------------
+        let excelFilePendente = null;
+
+        function importarExcelInteligenteModal(event) {
+            const file = event.target.files[0]; 
+            if (!file) return;
+            excelFilePendente = file;
+            event.target.value = null; 
+            abrirModalData('excel');
+        }
+
+        async function executarImportacaoExcel(dataCriacaoStr) {
+            if (!excelFilePendente) return;
+            
+            mostrarAlerta('A processar ficheiro Excel e a aplicar filtro de limpeza e segurança...');
+
+            const reader = new FileReader();
+            reader.onload = async function(e) {
+                try {
+                    const data = new Uint8Array(e.target.result); 
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const rows = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]], { header: 1 });
+                    
+                    if (rows.length === 0) {
+                        return mostrarAlerta('Ficheiro Excel selecionado está vazio!');
+                    }
+
+                    const chavesExistentesBD = new Set(todasAsObras.map(o => String((o.obra_ref || '') + (o.referencia || '')).trim().toLowerCase().replace(/\s+/g, '')));
+                    const obrasParaInserir = []; 
+                    const refsSet = new Set();
+                    
+                    let totalLidas = 0;
+                    let ignoradas = 0;
+
+                    const headers = rows[0] || [];
+                    const headerStr = JSON.stringify(headers).toLowerCase();
+                    const isCheckpoint = (headerStr.includes("obra") && headerStr.includes("fase"));
+
+                    if (isCheckpoint) {
+                        const colObra = headers.findIndex(h => String(h).toLowerCase().includes("obra"));
+                        const colDesig = headers.findIndex(h => String(h).toLowerCase().includes("designa") || String(h).toLowerCase().includes("peça"));
+                        const colFase = headers.findIndex(h => String(h).toLowerCase().includes("fase"));
+                        const colSetor = headers.findIndex(h => String(h).toLowerCase().includes("setor"));
+                        const colTrab = headers.findIndex(h => String(h).toLowerCase().includes("trabalhador"));
+                        const colKg = headers.findIndex(h => String(h).toLowerCase().includes("kg"));
+                        const colPol = headers.findIndex(h => String(h).toLowerCase().includes("pol"));
+                        const colHoras = headers.findIndex(h => String(h).toLowerCase().includes("hora"));
+                        const colPrio = headers.findIndex(h => String(h).toLowerCase().includes("prio"));
+                        const colObs = headers.findIndex(h => String(h).toLowerCase().includes("coment") || String(h).toLowerCase().includes("obs"));
+                        const colData = headers.findIndex(h => String(h).toLowerCase().includes("data"));
+                        const colRastreio = headers.findIndex(h => String(h).toLowerCase().includes("rastreio"));
+                        const colMaterial = headers.findIndex(h => String(h).toLowerCase().includes("material"));
+
+                        for (let i = 1; i < rows.length; i++) {
+                            const row = rows[i];
+                            if (!row || row.length === 0) continue;
+
+                            const refE = colObra !== -1 ? String(row[colObra] || '').trim() : 'MANUAL';
+                            const desig = colDesig !== -1 ? String(row[colDesig] || '').trim() : 'Sem Referência';
+                            
+                            if (refE || desig) {
+                                totalLidas++; 
+                                const idUnico = String(refE + desig).trim().toLowerCase().replace(/\s+/g, '');
+                                
+                                if (chavesExistentesBD.has(idUnico) || refsSet.has(idUnico)) { 
+                                    ignoradas++; 
+                                    continue; 
+                                }
+                                refsSet.add(idUnico);
+
+                                const vKg = colKg !== -1 ? (parseFloat(String(row[colKg] || '0').replace(',', '.')) || 0) : 0;
+                                const vPol = colPol !== -1 ? (parseFloat(String(row[colPol] || '0').replace(',', '.')) || 0) : 0;
+                                const vHoras = colHoras !== -1 ? (parseFloat(String(row[colHoras] || '0').replace(',', '.')) || 0) : 0;
+                                
+                                const dataExcel = colData !== -1 ? String(row[colData] || '') : '';
+                                const rastreioExcel = colRastreio !== -1 ? String(row[colRastreio] || '') : '';
+                                const materialExcel = colMaterial !== -1 ? String(row[colMaterial] || '') : '';
+
+                                obrasParaInserir.push({ 
+                                    obra_ref: sanitizeForDB(refE || 'MANUAL'), 
+                                    referencia: sanitizeForDB(desig || 'Sem Referência'), 
+                                    kg: vKg, 
+                                    toneladas: vKg, 
+                                    polegadas: vPol, 
+                                    horas: vHoras,
+                                    prioridade: sanitizeForDB(String(row[colPrio] || 'Normal')), 
+                                    fase: sanitizeForDB(String(row[colFase] || 'Projeto')), 
+                                    setor: colSetor !== -1 ? sanitizeForDB(String(row[colSetor] || 'Geral')) : 'Geral',
+                                    trabalhador: colTrab !== -1 ? sanitizeForDB(String(row[colTrab] || 'Não Atribuído')) : 'Não Atribuído',
+                                    comentarios: sanitizeForDB(String(row[colObs] || '')),
+                                    data_criacao: sanitizeForDB(dataExcel || dataCriacaoStr),
+                                    rastreio: sanitizeForDB(rastreioExcel),
+                                    material: sanitizeForDB(materialExcel)
+                                });
+                            }
+                        }
+                    } else {
+                        let lastSeenRef = 'MANUAL'; 
+                        for (let i = 0; i < rows.length; i++) {
+                            const row = rows[i]; 
+                            if (!row || row.length === 0) continue;
+                            
+                            let refE = null;
+                            let desig = null;
+                            let trab = 'Não Atribuído';
+                            const linhaStr = row.map(c => String(c || '')).join(' | ');
+                            let foundCodeThisRow = false;
+
+                            for (let j = 0; j < row.length; j++) {
+                                const cellText = String(row[j] || '').trim();
+                                const matchCode = cellText.match(/([A-Za-z]{2}\d{4,5})/i);
+                                
+                                if (matchCode) { 
+                                    refE = matchCode[1].toUpperCase(); 
+                                    lastSeenRef = refE; 
+                                    foundCodeThisRow = true;
+                                    
+                                    const matchFull = cellText.match(/([A-Za-z]{2}\d{4,5})[ _\-]*(.*?)(?:\.pdf|$)/i);
+                                    if (matchFull && matchFull[2] && matchFull[2].length > 1) {
+                                        desig = matchFull[2].replace(/^-/, '').trim();
+                                    } else {
+                                        for (let k = j + 1; k < row.length; k++) {
+                                            const nextCell = String(row[k] || '').trim();
+                                            if (nextCell && nextCell.length > 2) { 
+                                                desig = nextCell.replace(/\.pdf$/i, '').replace(/^-/, '').trim(); 
+                                                break; 
+                                            }
+                                        }
+                                    }
+                                    break; 
+                                }
+                            }
+
+                            if (!foundCodeThisRow) {
+                                refE = lastSeenRef;
+                                for (let j = 0; j < row.length; j++) {
+                                    const cellText = String(row[j] || '').trim();
+                                    if (cellText && cellText.length > 2) { 
+                                        desig = cellText.replace(/\.pdf$/i, '').replace(/^-/, '').trim(); 
+                                        break; 
+                                    }
+                                }
+                            }
+
+                            if (!desig) continue;
+
+                            if (refE) {
+                                totalLidas++; 
+                                const idUnico = String(refE + desig).trim().toLowerCase().replace(/\s+/g, '');
+                                if (chavesExistentesBD.has(idUnico) || refsSet.has(idUnico)) { 
+                                    ignoradas++; 
+                                    continue; 
+                                }
+                                refsSet.add(idUnico);
+
+                                const equipa = ['suellen', 'josé', 'jose', 'jenifer', 'douglas', 'neto', 'alexandre', 'jorge', 'diogo', 'yaroslav', 'oleh', 'camila', 'ismael', 'igor', 'luís', 'luis'];
+                                for (let t of equipa) {
+                                    if (linhaStr.toLowerCase().includes(t)) { 
+                                        trab = t.charAt(0).toUpperCase() + t.slice(1); 
+                                        if (trab.toLowerCase() === 'jose') trab = 'José'; 
+                                        if (trab.toLowerCase() === 'luis') trab = 'Luís'; 
+                                        break; 
+                                    }
+                                }
+                                
+                                obrasParaInserir.push({ 
+                                    obra_ref: sanitizeForDB(refE), 
+                                    referencia: sanitizeForDB(desig), 
+                                    kg: 0, 
+                                    toneladas: 0, 
+                                    polegadas: 0, 
+                                    horas: 0,
+                                    prioridade: 'Normal', 
+                                    fase: 'Projeto', 
+                                    setor: 'Geral', 
+                                    trabalhador: sanitizeForDB(trab),
+                                    data_criacao: dataCriacaoStr, 
+                                    rastreio: '',
+                                    material: ''
+                                });
+                            }
+                        }
+                    }
+
+                    if (obrasParaInserir.length === 0) {
+                        return mostrarAlerta(`Análise terminada: Lemos ${totalLidas} peças. Todas já existem na BD (ignoradas ${ignoradas}).`);
+                    }
+                    
+                    let inseridos = 0;
+                    let dbFailsOnNewColumns = false;
+
+                    for (let i = 0; i < obrasParaInserir.length; i += 500) {
+                        let lote = obrasParaInserir.slice(i, i + 500);
+                        let res = await supabaseClient.from('cartoes_kanban').insert(lote).select();
+                        
+                        if (res.error) {
+                            dbFailsOnNewColumns = true;
+                            const loteSeguro = lote.map(o => {
+                                const copy = {...o}; 
+                                delete copy.kg; 
+                                delete copy.polegadas; 
+                                delete copy.horas;
+                                delete copy.data_criacao; 
+                                delete copy.rastreio; 
+                                delete copy.material; 
+                                return copy;
+                            });
+                            const fallbackRes = await supabaseClient.from('cartoes_kanban').insert(loteSeguro).select();
+                            res.error = fallbackRes.error; 
+                        }
+
+                        if (res.error) {
+                            return mostrarAlerta('Erro crítico ao guardar: ' + res.error.message);
+                        }
+                        inseridos += lote.length;
+                    }
+                    
+                    if (dbFailsOnNewColumns) {
+                        mostrarAlerta(`Aviso: O Supabase não tem a atualização de colunas. As ${inseridos} obras foram inseridas em modo de segurança.`);
+                    } else {
+                        mostrarAlerta(`Limpeza Concluída! Lemos ${totalLidas} peças. Ignoradas ${ignoradas} antigas. Inseridas ${inseridos} NOVAS obras.`); 
+                    }
+                    carregarTudo();
+                } catch (err) { 
+                    mostrarAlerta('Erro geral no Excel: ' + err.message); 
+                }
+            }; 
+            reader.readAsArrayBuffer(excelFilePendente);
+        }
+
+        // -----------------------------------------------------
+        // PESQUISA E RENDERIZAÇÃO GERAL
+        // -----------------------------------------------------
+        function renderizarKanbanComFiltro() {
+            const activePage = document.querySelector('.page.active').id;
+            const queryMain = document.getElementById('kanban-search-input') ? document.getElementById('kanban-search-input').value.trim().toLowerCase() : '';
+            const queryLaser = document.getElementById('laser-search-input') ? document.getElementById('laser-search-input').value.trim().toLowerCase() : '';
+            
+            const boardKanban = document.getElementById('boardKanban');
+            const boardLaser = document.getElementById('boardLaser');
+            
+            boardKanban.style.display = 'none';
+            boardLaser.style.display = 'none';
+
+            document.querySelectorAll('.column-content').forEach(z => {
+                z.innerHTML = '';
+            });
+
+            todasAsObras.forEach(o => {
+                if (String(o.fase) === 'Arquivado') return;
+                
+                if (activePage === 'page-kanban') {
+                    let mostrar = true; 
+                    if (queryMain) {
+                        const texto = `${o.obra_ref||''} ${o.referencia||''} ${o.trabalhador||''} ${o.comentarios||''} ${o.prioridade||''} ${o.material||''}`.toLowerCase();
+                        if (!texto.includes(queryMain)) mostrar = false;
+                    }
+                    if (mostrar) renderCartaoMain(o);
+                }
+                else if (activePage === 'page-laser') {
+                    if (o.fase !== 'Furação e Corte' && o.fase !== 'Laser') return;
+                    let mostrarLaser = true;
+                    if (queryLaser) {
+                        const textoLaser = `${o.obra_ref||''} ${o.referencia||''} ${o.comentarios||''} ${o.prioridade||''} ${o.material||''}`.toLowerCase();
+                        if (!textoLaser.includes(queryLaser)) mostrarLaser = false;
+                    }
+                    if (mostrarLaser) renderCartaoLaser(o);
+                }
+            });
+            
+            boardKanban.style.display = 'flex';
+            boardLaser.style.display = 'flex';
+
+            setTimeout(atualizarTamanhoScrollTopo, 100);
+        }
+
+        function filtrarConsultas() {
+            const query = String(document.getElementById('search-query').value || '').trim().toLowerCase();
+            const container = document.getElementById('consulta-results');
+            
+            if (!query) {
+                return container.innerHTML = '<p style="color: var(--text-secondary); text-align: center; margin-top: 30px;">Digite o código da obra para listar as peças.</p>';
+            }
+
+            const resultados = todasAsObras.filter(o => {
+                const searchStr = `${o.obra_ref||''} ${o.referencia||''} ${o.trabalhador||''} ${o.fase||''}`.toLowerCase();
+                return searchStr.includes(query);
+            });
+            
+            if (resultados.length === 0) {
+                return container.innerHTML = '<p style="color: var(--text-secondary); text-align: center; margin-top: 20px;">Nenhuma obra ou peça encontrada.</p>';
+            }
+
+            container.innerHTML = resultados.map(o => {
+                const pesoHistorico = o.kg !== undefined && o.kg !== null ? o.kg : (o.toneladas || 0);
+                const dataShow = o.data_criacao ? ` | 📅 ${formatarDataVisivel(o.data_criacao)}` : '';
+                return `
+                <div class="consult-item">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <strong style="font-size: 14px;"><span style="color:var(--prf-blue-light);">[${escapeHTML(o.obra_ref || 'GERAL')}]</span> ${escapeHTML(o.referencia)}</strong>
+                        <span style="font-size: 11px; padding: 2px 6px; border-radius: 4px; background: ${o.fase === 'Arquivado' ? '#555' : 'var(--prf-blue)'}; color: white;">fase: ${escapeHTML(o.fase)}</span>
+                    </div>
+                    <div style="font-size: 12px; color: var(--text-secondary); margin-top: 6px;">
+                        ⚖️ <b>${pesoHistorico}</b> Kg | 📏 <b>${o.polegadas || 0}"</b> | 👷 Operador: <b>${escapeHTML(o.trabalhador || 'Não Atribuído')}</b> | 🏷️ Prioridade: <b>${escapeHTML(o.prioridade || 'Normal')}</b> ${dataShow}
+                    </div>
+                </div>
+                `;
+            }).join('');
+        }
+
+        // -----------------------------------------------------
+        // DRAG AND DROP
+        // -----------------------------------------------------
+        document.querySelectorAll('.column-content').forEach(zone => {
+            zone.addEventListener('dragover', e => { 
+                e.preventDefault(); 
+                zone.classList.add('drag-over'); 
+            });
+            
+            zone.addEventListener('dragleave', () => { 
+                zone.classList.remove('drag-over'); 
+            });
+            
+            zone.addEventListener('drop', async e => {
+                e.preventDefault(); 
+                zone.classList.remove('drag-over');
+
+                if (currentUserRole === 'Visualizador') return; 
+                
+                const cardId = e.dataTransfer.getData('text/plain'); 
+                const cartao = document.getElementById(cardId);
+                
+                let target = e.target;
+                while (target && !target.classList.contains('column-content')) { 
+                    target = target.parentElement; 
+                }
+                
+                if (!target || !cartao) return;
+
+                const boardType = target.getAttribute('data-board');
+                let novaFase = target.getAttribute('data-fase');
+                let novoSetor = target.getAttribute('data-setor') || 'Geral';
+                let novoOperador = target.getAttribute('data-operador');
+                
+                target.appendChild(cartao); 
+                
+                const idx = todasAsObras.findIndex(o => o.id === cardId);
+                
+                if (idx !== -1) { 
+                    if (boardType === 'main' && novaFase === 'Furação e Corte') novoSetor = 'Aguardar Chapa';
+
+                    if (!novoOperador) {
+                        if (novaFase === 'Concluído Setor' || novaFase === 'Concluído' || novaFase === 'Pronto a Iniciar') {
+                            novoOperador = todasAsObras[idx].trabalhador;
+                        } else {
+                            novoOperador = 'Não Atribuído';
+                        }
+                    } else if (novoOperador === 'Qualquer') {
+                        novoOperador = todasAsObras[idx].trabalhador;
+                    }
+
+                    let trackLabel = '';
+                    if (boardType === 'laser') {
+                        if(novoSetor === 'Geral' && novaFase === 'Pronto a Iniciar') trackLabel = 'Corte (Pronto)';
+                        else trackLabel = novoSetor.replace(/-/g, ' ');
+                    } else {
+                        if (novoOperador && novoOperador !== 'Não Atribuído') trackLabel = novoOperador;
+                        else trackLabel = novaFase;
+                    }
+                    
+                    let currentRastreio = todasAsObras[idx].rastreio || '';
+                    if (!currentRastreio && todasAsObras[idx].trabalhador && todasAsObras[idx].trabalhador !== 'Não Atribuído') {
+                        currentRastreio = todasAsObras[idx].trabalhador;
+                    }
+                    
+                    let elements = currentRastreio.split('//').map(e => e.trim()).filter(e => e !== '');
+                    let lastElement = elements.length > 0 ? elements[elements.length - 1] : '';
+
+                    if (trackLabel && lastElement !== trackLabel && !novaFase.includes('Concluído')) {
+                        if (!currentRastreio) currentRastreio = trackLabel;
+                        else currentRastreio += ' // ' + trackLabel;
+                        todasAsObras[idx].rastreio = currentRastreio;
+                    }
+                    
+                    todasAsObras[idx].fase = novaFase; 
+                    todasAsObras[idx].setor = novoSetor; 
+                    todasAsObras[idx].trabalhador = novoOperador; 
+
+                    let res = await supabaseClient.from('cartoes_kanban').update({ 
+                        fase: novaFase, 
+                        setor: novoSetor, 
+                        trabalhador: novoOperador,
+                        rastreio: todasAsObras[idx].rastreio
+                    }).eq('id', cardId);
+                    
+                    if (res.error && res.error.message.includes('does not exist')) {
+                        await supabaseClient.from('cartoes_kanban').update({ 
+                            fase: novaFase, 
+                            setor: novoSetor, 
+                            trabalhador: novoOperador 
+                        }).eq('id', cardId);
+                    }
+                }
+                
+                setTimeout(atualizarTamanhoScrollTopo, 100);
+            });
+        });
+
+        // -----------------------------------------------------
+        // RENDER CARTÃO MAIN E LASER (COM REGRAS VISUALIZADOR)
+        // -----------------------------------------------------
+        function renderCartaoMain(c) {
+            try {
+                const p = String(c.prioridade || 'Normal').toLowerCase().replace(/\s+/g, '-');
+                let f = String(c.fase || 'Projeto').replace(/"/g, ''); 
+                if (f === 'Laser') f = 'Furação e Corte';
+                
+                const t = String(c.trabalhador || 'Não Atribuído').replace(/"/g, ''); 
+                const s = String(c.setor || '').replace(/"/g, '');
+                if (f === 'Em Espera') f = 'Em Fila';
+
+                let z = null;
+                if (f && t && t !== 'Não Atribuído') z = document.querySelector(`#page-kanban .column-content[data-fase="${f}"][data-operador="${t}"]`);
+                if (!z && f === 'Concluído Setor' && s) z = document.querySelector(`#page-kanban .column-content[data-fase="${f}"][data-setor="${s}"]`);
+                if (!z) z = document.querySelector(`#page-kanban .column-content[data-fase="${f}"]`);
+                if (!z) z = document.querySelector(`#page-kanban .column-content[data-fase="Projeto"]`);
+
+                if (z) {
+                    const el = document.createElement('div'); 
+                    el.className = `card prio-${p}`; 
+                    el.draggable = (currentUserRole !== 'Visualizador'); 
+                    el.id = c.id;
+                    
+                    const safeObra = escapeHTML(c.obra_ref);
+                    const safeRef = escapeHTML(c.referencia);
+                    const safeTrab = escapeHTML(t);
+                    const bdg = c.obra_ref ? `<div class="obra-badge">${safeObra}</div>` : '';
+                    const vKg = c.kg !== undefined && c.kg !== null ? c.kg : (c.toneladas || 0); 
+                    const vPol = c.polegadas || 0;
+                    const vHoras = c.horas !== undefined && c.horas !== null ? c.horas : 0;
+                    
+                    let workerDisplay = c.rastreio ? escapeHTML(c.rastreio) : safeTrab;
+                    let removeBtnHtml = '';
+                    
+                    if (c.rastreio && c.rastreio.includes('//') && currentUserRole !== 'Visualizador') {
+                        removeBtnHtml = `<button class="btn-rastreio-del" title="Limpar Rastreio" style="background:none; border:none; color:#ef5350; cursor:pointer; font-size:11px; padding:0 4px; font-weight:bold; flex-shrink:0;">✖</button>`;
+                    }
+
+                    let isReadyForProduction = (f === 'Pronto a Iniciar');
+                    let laserReadyBadge = isReadyForProduction ? `<div class="laser-ready-badge">✅ PRONTO P/ PRODUÇÃO</div><br>` : '';
+
+                    let btnEditarApagar = '';
+                    if (currentUserRole !== 'Visualizador') {
+                        btnEditarApagar = `
+                            <button class="btn-card btn-editar">✏️ Editar</button>
+                            <button class="btn-card btn-apagar">🗑️ Apagar</button>
+                        `;
+                    }
+
+                    el.innerHTML = `
+                        ${laserReadyBadge}
+                        ${bdg}
+                        <div class="card-ref">${safeRef || 'Sem Referência'}</div>
+                        
+                        <div class="card-info" style="margin-top:4px;">
+                            <div style="margin-bottom: 3px;">⚖️ ${vKg} Kg | 📏 ${vPol}" | ⏱️ ${vHoras}h</div>
+                            <div style="display:flex; justify-content:space-between; align-items:flex-start; background:rgba(0,0,0,0.04); padding:3px; border-radius:4px;">
+                                <span style="font-weight:bold; color:var(--prf-blue-dark); word-break:break-word; line-height:1.4;">
+                                    👷 ${workerDisplay}
+                                </span>
+                                ${removeBtnHtml}
+                            </div>
+                        </div>
+                        
+                        <div class="card-actions">
+                            <button class="btn-card btn-detalhes" style="color:var(--prf-blue-light) !important;">👁️ Detalhes</button>
+                            ${btnEditarApagar}
+                        </div>
+                    `;
+                    
+                    el.querySelector('.btn-detalhes').addEventListener('click', () => abrirModalDetalhes(c));
+
+                    if (currentUserRole !== 'Visualizador') {
+                        el.querySelector('.btn-editar').addEventListener('click', () => {
+                            abrirModalEdicao(c.id, c.obra_ref, c.referencia, vKg, vPol, vHoras, c.prioridade, c.comentarios, c.data_criacao, c.rastreio, t, c.material);
+                        });
+                        el.querySelector('.btn-apagar').addEventListener('click', () => apagarCartao(c.id));
+                        
+                        const btnRastreioDel = el.querySelector('.btn-rastreio-del');
+                        if (btnRastreioDel) {
+                            btnRastreioDel.addEventListener('click', () => {
+                                mostrarConfirmacao("Tem a certeza que deseja limpar o caminho de rastreio de colaboradores deste cartão?", () => limparRastreioCartao(c.id));
+                            });
+                        }
+                        el.addEventListener('dragstart', e => e.dataTransfer.setData('text/plain', c.id));
+                    }
+                    
+                    z.appendChild(el);
+                }
+            } catch (err) { console.error("Cartão problemático no Main Board:", err); }
+        }
+
+        function renderCartaoLaser(c) {
+            try {
+                const p = String(c.prioridade || 'Normal').toLowerCase().replace(/\s+/g, '-');
+                let s = String(c.setor || '').replace(/"/g, '');
+                if (!s || s === 'Geral') s = 'Aguardar Chapa';
+                
+                let z = document.querySelector(`#page-laser .column-content[data-setor="${s}"]`);
+                if (!z) z = document.querySelector(`#page-laser .column-content[data-setor="Aguardar Chapa"]`);
+
+                if (z) {
+                    const el = document.createElement('div'); 
+                    el.className = `card prio-${p}`; 
+                    el.draggable = (currentUserRole !== 'Visualizador'); 
+                    el.id = c.id;
+                    
+                    const safeObra = escapeHTML(c.obra_ref);
+                    const safeRef = escapeHTML(c.referencia);
+                    const safeMat = escapeHTML(c.material || 'Material N/D');
+
+                    const bdg = c.obra_ref ? `<div class="obra-badge">${safeObra}</div>` : '';
+                    const vKg = c.kg !== undefined && c.kg !== null ? c.kg : (c.toneladas || 0); 
+                    const vPol = c.polegadas || 0;
+                    const vHoras = c.horas !== undefined && c.horas !== null ? c.horas : 0;
+                    
+                    let btnEditar = '';
+                    if (currentUserRole !== 'Visualizador') {
+                        btnEditar = `<button class="btn-card btn-editar">✏️ Editar (Corte)</button>`;
+                    }
+
+                    el.innerHTML = `
+                        ${bdg}
+                        <div class="card-ref">${safeRef || 'Sem Referência'}</div>
+                        <div class="card-info" style="margin-top:4px;">
+                            <div style="margin-bottom: 3px;">⚖️ ${vKg} Kg | 📏 ${vPol}" | ⏱️ ${vHoras}h</div>
+                            <div style="background:rgba(0,0,0,0.04); padding:3px; border-radius:4px; font-weight:bold; color: #ef5350;">
+                                ⚙️ Mat: ${safeMat}
+                            </div>
+                        </div>
+                        <div class="card-actions">
+                            <button class="btn-card btn-detalhes" style="color:var(--prf-blue-light) !important;">👁️ Detalhes</button>
+                            ${btnEditar}
+                        </div>
+                    `;
+                    
+                    el.querySelector('.btn-detalhes').addEventListener('click', () => abrirModalDetalhes(c));
+
+                    if (currentUserRole !== 'Visualizador') {
+                        el.querySelector('.btn-editar').addEventListener('click', () => {
+                            abrirModalEdicao(c.id, c.obra_ref, c.referencia, vKg, vPol, vHoras, c.prioridade, c.comentarios, c.data_criacao, c.rastreio, c.trabalhador, c.material);
+                        });
+                        el.addEventListener('dragstart', e => e.dataTransfer.setData('text/plain', c.id));
+                    }
+                    
+                    z.appendChild(el);
+                }
+            } catch (err) { console.error("Cartão problemático no Corte Board:", err); }
+        }
+
+        // -----------------------------------------------------
+        // POP-UP DETALHES
+        // -----------------------------------------------------
+        function abrirModalDetalhes(c) {
+            document.getElementById('details-badge').innerText = c.obra_ref || 'GERAL';
+            document.getElementById('details-title').innerText = c.referencia || 'Sem Referência';
+            document.getElementById('details-date').innerText = c.data_criacao ? formatarDataVisivel(c.data_criacao) : 'N/A';
+            document.getElementById('details-prio').innerText = c.prioridade || 'Normal';
+            const vKg = c.kg !== undefined && c.kg !== null ? c.kg : (c.toneladas || 0); 
+            document.getElementById('details-kg').innerText = vKg;
+            document.getElementById('details-pol').innerText = c.polegadas || 0;
+            const vHoras = c.horas !== undefined && c.horas !== null ? c.horas : 0;
+            document.getElementById('details-horas').innerText = vHoras;
+            document.getElementById('details-material').innerText = c.material || 'N/A';
+
+            const timelineDiv = document.getElementById('details-timeline');
+            let trackStr = c.rastreio || c.trabalhador || 'Não Atribuído';
+            let steps = trackStr.split('//').map(s => s.trim()).filter(s => s !== '');
+            
+            if (steps.length > 0) {
+                timelineDiv.innerHTML = steps.map((step, index) => `<div style="margin-bottom:4px;">${index + 1}. ${escapeHTML(step)}</div>`).join('');
+            } else {
+                timelineDiv.innerHTML = '<i>Sem movimentações.</i>';
+            }
+
+            const commentsUl = document.getElementById('details-comments');
+            if (c.comentarios && c.comentarios.trim() !== '') {
+                commentsUl.innerHTML = c.comentarios.split('\n').filter(line => line.trim() !== '').map(line => `<li>${escapeHTML(line.trim())}</li>`).join('');
+            } else {
+                commentsUl.innerHTML = '<li style="list-style:none; color:var(--text-secondary); font-style:italic;">Sem observações registadas.</li>';
+            }
+
+            document.getElementById('details-modal').classList.add('active');
+        }
+
+        function fecharDetalhes() { document.getElementById('details-modal').classList.remove('active'); }
+
+        async function limparRastreioCartao(id) {
+            const idx = todasAsObras.findIndex(o => o.id === id);
+            if (idx !== -1) {
+                todasAsObras[idx].rastreio = '';
+                await supabaseClient.from('cartoes_kanban').update({ rastreio: '' }).eq('id', id);
+                renderizarKanbanComFiltro();
+            }
+        }
+
+        // -----------------------------------------------------
+        // EDIÇÃO NO MODAL
+        // -----------------------------------------------------
+        function abrirModalEdicao(id, obra, ref, kg, pol, horas, prio, comentarios, dataCriacao, rastreio, trabalhadorAtual, material) {
+            document.getElementById('edit-id').value = id; 
+            document.getElementById('edit-obra').value = obra || ''; 
+            document.getElementById('edit-ref').value = ref || '';
+            document.getElementById('edit-kg').value = kg || 0; 
+            document.getElementById('edit-pol').value = pol || 0;
+            document.getElementById('edit-horas').value = horas || 0;
+            document.getElementById('edit-prio').value = prio || 'Normal'; 
+            document.getElementById('edit-comments').value = comentarios || '';
+            document.getElementById('edit-material').value = material || '';
+            document.getElementById('edit-material-original').value = material || '';
+            
+            let dateVal = '';
+            if (dataCriacao) dateVal = String(dataCriacao).split('T')[0].split(' ')[0];
+            document.getElementById('edit-date').value = dateVal;
+            
+            let currentRast = rastreio || '';
+            if (!currentRast && trabalhadorAtual && trabalhadorAtual !== 'Não Atribuído') currentRast = trabalhadorAtual;
+            
+            document.getElementById('edit-rastreio-current').value = currentRast;
+            document.getElementById('edit-rastreio-add').value = '';
+            
+            let disp = document.getElementById('current-rastreio-display');
+            if (currentRast) disp.innerHTML = `Histórico Atual: <b style="color:var(--prf-blue);">${escapeHTML(currentRast)}</b>`;
+            else disp.innerHTML = `Nenhum histórico ativo.`;
+            
+            document.getElementById('edit-modal').classList.add('active');
+        }
+
+        function fecharModal() { document.getElementById('edit-modal').classList.remove('active'); }
+
+        function verificarESalvarEdicao() {
+            const materialOriginal = document.getElementById('edit-material-original').value.trim();
+            const novoMaterial = document.getElementById('edit-material').value.trim();
+
+            if (materialOriginal !== novoMaterial) {
+                mostrarConfirmacao(`O tipo de material foi alterado de "${materialOriginal || 'Vazio'}" para "${novoMaterial}". Tem a certeza que deseja confirmar esta alteração?`, () => executarSalvarEdicao(novoMaterial));
+            } else {
+                executarSalvarEdicao(novoMaterial);
+            }
+        }
+
+        async function executarSalvarEdicao(novoMaterial) {
+            const id = document.getElementById('edit-id').value;
+            const vKg = parseNumeroSeguro('edit-kg');
+            const vPol = parseNumeroSeguro('edit-pol');
+            const vHoras = parseNumeroSeguro('edit-horas');
+
+            let oldRastreio = document.getElementById('edit-rastreio-current').value.trim();
+            let toAdd = document.getElementById('edit-rastreio-add').value.trim();
+            let finalRastreio = oldRastreio;
+            
+            if (toAdd) {
+                if (finalRastreio) finalRastreio += ' // ' + toAdd;
+                else finalRastreio = toAdd;
+            }
+
+            const updateData = {
+                obra_ref: sanitizeForDB(document.getElementById('edit-obra').value), 
+                referencia: sanitizeForDB(document.getElementById('edit-ref').value),
+                kg: vKg, 
+                toneladas: vKg, 
+                polegadas: vPol, 
+                horas: vHoras,
+                prioridade: sanitizeForDB(document.getElementById('edit-prio').value), 
+                comentarios: sanitizeForDB(document.getElementById('edit-comments').value),
+                data_criacao: sanitizeForDB(document.getElementById('edit-date').value),
+                rastreio: sanitizeForDB(finalRastreio),
+                material: sanitizeForDB(novoMaterial)
+            };
+
+            let res = await supabaseClient.from('cartoes_kanban').update(updateData).eq('id', id);
+
+            if (res.error) {
+                const fallbackData = { ...updateData }; 
+                delete fallbackData.kg; delete fallbackData.polegadas; delete fallbackData.horas; delete fallbackData.data_criacao; delete fallbackData.rastreio; delete fallbackData.material;
+                const fallbackRes = await supabaseClient.from('cartoes_kanban').update(fallbackData).eq('id', id);
+                res = fallbackRes;
+            }
+
+            if (res.error) return mostrarAlerta('Erro ao guardar as alterações: ' + res.error.message);
+            fecharModal(); carregarTudo();
+        }
+
+        function apagarCartao(id) {
+            mostrarConfirmacao("Apagar componente permanentemente?", async function() { 
+                await supabaseClient.from('cartoes_kanban').delete().eq('id', id); 
+                carregarTudo(); 
+            });
+        }
+
+        // -----------------------------------------------------
+        // CÁLCULO DOS NOVOS KPIS
+        // -----------------------------------------------------
+        function calcularKPIs() {
+            let totalKgAno = 0; let kgEmExecucao = 0; let pecasEmExecucao = 0;
+            let kgEmFila = 0; let pecasEmFila = 0; let kgPendente = 0; let pecasPendente = 0;
+            let kgConcluido = 0; let pecasConcluido = 0; let totalRetrabalhos = 0;
+            let retrabalhosConcluidos = 0; 
+            
+            // Contadores de Unidades por Categoria
+            let unidMaxima = 0; let unidLaranja = 0; let unidAmarelo = 0; 
+            let unidNormal = 0; let unidRaiox = 0; let unidRetrabalhoCat = 0;
+            
+            // Contadores de Horas por Categoria
+            let horasMaxima = 0; let horasLaranja = 0; let horasAmarelo = 0; 
+            let horasNormal = 0; let horasRaiox = 0; let horasRetrabalhoCat = 0;
+
+            // Contadores de KGs por Categoria
+            let kgMaxima = 0; let kgLaranja = 0; let kgAmarelo = 0; 
+            let kgNormal = 0; let kgRaiox = 0; let kgRetrabalhoCat = 0;
+
+            // Contadores de Polegadas por Categoria
+            let polMaxima = 0; let polLaranja = 0; let polAmarelo = 0; 
+            let polNormal = 0; let polRaiox = 0; let polRetrabalhoCat = 0;
+
+            todasAsObras.forEach(o => {
+                const peso = parseFloat(o.kg !== undefined && o.kg !== null ? o.kg : (o.toneladas || 0)) || 0;
+                const polegadas = parseFloat(o.polegadas) || 0;
+                const hr = parseFloat(o.horas) || 0;
+                
+                if (o.prioridade === 'Retrabalho') totalRetrabalhos++;
+
+                if (o.fase !== 'Arquivado') {
+                    totalKgAno += peso;
+                    
+                    // Cálculo da nova grelha de Somatórios por Categoria
+                    const prio = o.prioridade || 'Normal';
+                    if (prio === 'Vermelho' || prio === 'Máxima') { unidMaxima++; horasMaxima += hr; kgMaxima += peso; polMaxima += polegadas; }
+                    else if (prio === 'Laranja') { unidLaranja++; horasLaranja += hr; kgLaranja += peso; polLaranja += polegadas; }
+                    else if (prio === 'Amarelo') { unidAmarelo++; horasAmarelo += hr; kgAmarelo += peso; polAmarelo += polegadas; }
+                    else if (prio === 'Raio X') { unidRaiox++; horasRaiox += hr; kgRaiox += peso; polRaiox += polegadas; }
+                    else if (prio === 'Retrabalho') { unidRetrabalhoCat++; horasRetrabalhoCat += hr; kgRetrabalhoCat += peso; polRetrabalhoCat += polegadas; }
+                    else { unidNormal++; horasNormal += hr; kgNormal += peso; polNormal += polegadas; }
+                }
+
+                if (o.fase === 'Produção') { kgEmExecucao += peso; pecasEmExecucao++; } 
+                else if (o.fase === 'Em Fila' || o.fase === 'Em Espera') { kgEmFila += peso; pecasEmFila++; } 
+                else if (o.fase === 'Pendente') { kgPendente += peso; pecasPendente++; } 
+                else if (o.fase === 'Concluído') { kgConcluido += peso; pecasConcluido++; if (o.prioridade === 'Retrabalho') retrabalhosConcluidos++; }
+            });
+            
+            let taxaRetrabalho = pecasConcluido > 0 ? ((retrabalhosConcluidos / pecasConcluido) * 100).toFixed(1) : 0;
+
+            // Injetar KPIs Gerais
+            document.getElementById('kpi-retrabalho').innerHTML = `${totalRetrabalhos} Unid <span class="kpi-subtitle">(${taxaRetrabalho}% de todas as concluídas)</span>`;
+            document.getElementById('kpi-tons-ano').innerText = totalKgAno.toFixed(1) + " Kg";
+            document.getElementById('kpi-em-execucao').innerHTML = kgEmExecucao.toFixed(1) + " Kg <span class='kpi-subtitle'>(" + pecasEmExecucao + " unid)</span>";
+            document.getElementById('kpi-em-fila').innerHTML = kgEmFila.toFixed(1) + " Kg <span class='kpi-subtitle'>(" + pecasEmFila + " unid)</span>";
+            document.getElementById('kpi-pendentes').innerHTML = kgPendente.toFixed(1) + " Kg <span class='kpi-subtitle'>(" + pecasPendente + " unid)</span>";
+            document.getElementById('kpi-concluido-final').innerHTML = kgConcluido.toFixed(1) + " Kg <span class='kpi-subtitle'>(" + pecasConcluido + " unid)</span>";
+            
+            // Injetar Nova Grelha de Categorias / Horas / Kg / Pol
+            document.getElementById('kpi-max-unid').innerText = `${unidMaxima} Unid`;
+            document.getElementById('kpi-max-detalhes').innerText = `⚖️ ${kgMaxima.toFixed(1)} Kg | 📏 ${polMaxima.toFixed(1)}"`;
+            document.getElementById('kpi-max-horas').innerText = `⏱️ ${horasMaxima.toFixed(1)} Horas`;
+            
+            document.getElementById('kpi-req-interna').innerText = `${unidLaranja} Unid`;
+            document.getElementById('kpi-req-interna-detalhes').innerText = `⚖️ ${kgLaranja.toFixed(1)} Kg | 📏 ${polLaranja.toFixed(1)}"`;
+            document.getElementById('kpi-req-interna-horas').innerText = `⏱️ ${horasLaranja.toFixed(1)} Horas`;
+            
+            document.getElementById('kpi-pintura-unid').innerText = `${unidAmarelo} Unid`;
+            document.getElementById('kpi-pintura-detalhes').innerText = `⚖️ ${kgAmarelo.toFixed(1)} Kg | 📏 ${polAmarelo.toFixed(1)}"`;
+            document.getElementById('kpi-pintura-horas').innerText = `⏱️ ${horasAmarelo.toFixed(1)} Horas`;
+            
+            document.getElementById('kpi-normal-unid').innerText = `${unidNormal} Unid`;
+            document.getElementById('kpi-normal-detalhes').innerText = `⚖️ ${kgNormal.toFixed(1)} Kg | 📏 ${polNormal.toFixed(1)}"`;
+            document.getElementById('kpi-normal-horas').innerText = `⏱️ ${horasNormal.toFixed(1)} Horas`;
+            
+            document.getElementById('kpi-raiox-unid').innerText = `${unidRaiox} Unid`;
+            document.getElementById('kpi-raiox-detalhes').innerText = `⚖️ ${kgRaiox.toFixed(1)} Kg | 📏 ${polRaiox.toFixed(1)}"`;
+            document.getElementById('kpi-raiox-horas').innerText = `⏱️ ${horasRaiox.toFixed(1)} Horas`;
+            
+            const elRetrabalhoUnid = document.getElementById('kpi-retrabalho-unid');
+            const elRetrabalhoDetalhes = document.getElementById('kpi-retrabalho-detalhes');
+            const elRetrabalhoHoras = document.getElementById('kpi-retrabalho-horas');
+            if(elRetrabalhoUnid) elRetrabalhoUnid.innerText = `${unidRetrabalhoCat} Unid`;
+            if(elRetrabalhoDetalhes) elRetrabalhoDetalhes.innerText = `⚖️ ${kgRetrabalhoCat.toFixed(1)} Kg | 📏 ${polRetrabalhoCat.toFixed(1)}"`;
+            if(elRetrabalhoHoras) elRetrabalhoHoras.innerText = `⏱️ ${horasRetrabalhoCat.toFixed(1)} Horas`;
+        }
+
+        // -----------------------------------------------------
+        // CARREGAR TUDO DA BD (LOOP INICIAL)
+        // -----------------------------------------------------
+        async function carregarTudo() {
+            const counterEl = document.getElementById('db-counter');
+            if(counterEl) counterEl.innerText = `🟢 A carregar obras da BD...`;
+            
+            let allData = []; 
+            let from = 0; let step = 999; let keepFetching = true;
+
+            while (keepFetching) {
+                const { data, error } = await supabaseClient.from('cartoes_kanban').select('*').range(from, from + step);
+                if (error) { mostrarAlerta('Erro de ligação à BD.'); break; }
+                if (data && data.length > 0) { allData = allData.concat(data); from += data.length; if (data.length <= step) keepFetching = false; } 
+                else { keepFetching = false; }
+            }
+            
+            todasAsObras = allData;
+            if(counterEl) counterEl.innerText = `🟢 ${todasAsObras.length} componentes carregados`;
+            
+            renderizarKanbanComFiltro();
+            calcularKPIs(); 
+            if (document.getElementById('page-briefing').classList.contains('active')) carregarBriefing();
+        }
+
+        window.onload = inicializarApp;
+    </script>
+</body>
+</html>

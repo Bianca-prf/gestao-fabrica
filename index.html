@@ -2990,7 +2990,11 @@
 
             while (keepFetching) {
                 const { data, error } = await supabaseClient.from('cartoes_kanban').select('*').range(from, from + step);
-                if (error) { mostrarAlerta('Erro de ligação à BD.'); break; }
+                if (error) { 
+                    mostrarAlerta('ERRO BD: ' + error.message + ' | Cód: ' + error.code); 
+                    keepFetching = false;
+                    break; 
+                }
                 if (data && data.length > 0) { allData = allData.concat(data); from += data.length; if (data.length <= step) keepFetching = false; } 
                 else { keepFetching = false; }
             }

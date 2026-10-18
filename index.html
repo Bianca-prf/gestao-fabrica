@@ -669,7 +669,7 @@
         }
 
         .kpi-card { 
-            background: var(--bg-card); /* Fundo sempre adaptável (claro/escuro) */
+            background: var(--bg-card); 
             padding: 20px; 
             border-radius: 8px; 
             border-left: 4px solid var(--prf-blue); 
@@ -697,11 +697,10 @@
             margin-left: 5px; 
         }
         
-        /* Formatação do Valor Grande (Para as Horas nas Categorias) */
         .kpi-value-highlight {
             font-size: 20px;
             font-weight: bold;
-            color: var(--text-main); /* Adaptável claro/escuro para sempre se ler */
+            color: var(--text-main); 
             margin-top: 5px;
             padding-top: 5px;
             border-top: 1px dashed rgba(128,128,128,0.3);
@@ -2928,8 +2927,18 @@
         }
 
         // -----------------------------------------------------
-        // CÁLCULO DOS NOVOS KPIS
+        // CÁLCULO DOS NOVOS KPIS (MÉTODO BLINDADO)
         // -----------------------------------------------------
+        
+        function inserirKpiSeguro(id, valorHtml) {
+            try {
+                const el = document.getElementById(id);
+                if (el) el.innerHTML = valorHtml;
+            } catch (e) {
+                console.error("Erro a atualizar o KPI:", id);
+            }
+        }
+
         function calcularKPIs() {
             let totalKgAno = 0; let kgEmExecucao = 0; let pecasEmExecucao = 0;
             let kgEmFila = 0; let pecasEmFila = 0; let kgPendente = 0; let pecasPendente = 0;
@@ -2957,64 +2966,80 @@
                 const polegadas = parseFloat(String(o.polegadas || '0').replace(',', '.')) || 0;
                 const hr = parseFloat(String(o.horas || '0').replace(',', '.')) || 0;
                 
-                if (o.prioridade === 'Retrabalho') totalRetrabalhos++;
+                // Extração agressiva da prioridade para não falhar com espaços ou diferenças de escrita
+                const prioPura = String(o.prioridade || 'Normal').trim().toLowerCase();
+
+                if (prioPura.includes('retrabalho')) totalRetrabalhos++;
 
                 if (o.fase !== 'Arquivado') {
                     totalKgAno += peso;
                     
                     // Cálculo da nova grelha de Somatórios por Categoria
-                    const prio = o.prioridade || 'Normal';
-                    if (prio === 'Vermelho' || prio === 'Máxima') { unidMaxima++; horasMaxima += hr; kgMaxima += peso; polMaxima += polegadas; }
-                    else if (prio === 'Laranja') { unidLaranja++; horasLaranja += hr; kgLaranja += peso; polLaranja += polegadas; }
-                    else if (prio === 'Amarelo') { unidAmarelo++; horasAmarelo += hr; kgAmarelo += peso; polAmarelo += polegadas; }
-                    else if (prio === 'Raio X') { unidRaiox++; horasRaiox += hr; kgRaiox += peso; polRaiox += polegadas; }
-                    else if (prio === 'Retrabalho') { unidRetrabalhoCat++; horasRetrabalhoCat += hr; kgRetrabalhoCat += peso; polRetrabalhoCat += polegadas; }
-                    else { unidNormal++; horasNormal += hr; kgNormal += peso; polNormal += polegadas; }
+                    if (prioPura.includes('vermelho') || prioPura.includes('máxima') || prioPura.includes('maxima')) { 
+                        unidMaxima++; horasMaxima += hr; kgMaxima += peso; polMaxima += polegadas; 
+                    }
+                    else if (prioPura.includes('laranja') || prioPura.includes('interna')) { 
+                        unidLaranja++; horasLaranja += hr; kgLaranja += peso; polLaranja += polegadas; 
+                    }
+                    else if (prioPura.includes('amarelo') || prioPura.includes('pintura')) { 
+                        unidAmarelo++; horasAmarelo += hr; kgAmarelo += peso; polAmarelo += polegadas; 
+                    }
+                    else if (prioPura.includes('raio x') || prioPura.includes('raiox') || prioPura.includes('roxo')) { 
+                        unidRaiox++; horasRaiox += hr; kgRaiox += peso; polRaiox += polegadas; 
+                    }
+                    else if (prioPura.includes('retrabalho')) { 
+                        unidRetrabalhoCat++; horasRetrabalhoCat += hr; kgRetrabalhoCat += peso; polRetrabalhoCat += polegadas; 
+                    }
+                    else { 
+                        unidNormal++; horasNormal += hr; kgNormal += peso; polNormal += polegadas; 
+                    }
                 }
 
+                // Cálculo dos totais do Topo
                 if (o.fase === 'Produção') { kgEmExecucao += peso; pecasEmExecucao++; } 
                 else if (o.fase === 'Em Fila' || o.fase === 'Em Espera') { kgEmFila += peso; pecasEmFila++; } 
                 else if (o.fase === 'Pendente') { kgPendente += peso; pecasPendente++; } 
-                else if (o.fase === 'Concluído') { kgConcluido += peso; pecasConcluido++; if (o.prioridade === 'Retrabalho') retrabalhosConcluidos++; }
+                else if (o.fase === 'Concluído') { 
+                    kgConcluido += peso; 
+                    pecasConcluido++; 
+                    if (prioPura.includes('retrabalho')) retrabalhosConcluidos++; 
+                }
             });
             
             let taxaRetrabalho = pecasConcluido > 0 ? ((retrabalhosConcluidos / pecasConcluido) * 100).toFixed(1) : 0;
 
-            // Injetar KPIs Gerais
-            document.getElementById('kpi-retrabalho').innerHTML = `${totalRetrabalhos} Unid <span class="kpi-subtitle">(${Number(taxaRetrabalho)}% de todas as concluídas)</span>`;
-            document.getElementById('kpi-tons-ano').innerText = Number(totalKgAno.toFixed(2)) + " Kg";
-            document.getElementById('kpi-em-execucao').innerHTML = Number(kgEmExecucao.toFixed(2)) + " Kg <span class='kpi-subtitle'>(" + pecasEmExecucao + " unid)</span>";
-            document.getElementById('kpi-em-fila').innerHTML = Number(kgEmFila.toFixed(2)) + " Kg <span class='kpi-subtitle'>(" + pecasEmFila + " unid)</span>";
-            document.getElementById('kpi-pendentes').innerHTML = Number(kgPendente.toFixed(2)) + " Kg <span class='kpi-subtitle'>(" + pecasPendente + " unid)</span>";
-            document.getElementById('kpi-concluido-final').innerHTML = Number(kgConcluido.toFixed(2)) + " Kg <span class='kpi-subtitle'>(" + pecasConcluido + " unid)</span>";
+            // Injetar KPIs Gerais na página (Usando a função segura que evita bloqueios)
+            inserirKpiSeguro('kpi-retrabalho-geral', `${totalRetrabalhos} Unid <span class="kpi-subtitle">(${Number(taxaRetrabalho)}% Taxa Final)</span>`);
+            inserirKpiSeguro('kpi-tons-ano', Number(totalKgAno.toFixed(2)) + " Kg");
+            inserirKpiSeguro('kpi-em-execucao', Number(kgEmExecucao.toFixed(2)) + " Kg <span class='kpi-subtitle'>(" + pecasEmExecucao + " unid)</span>");
+            inserirKpiSeguro('kpi-em-fila', Number(kgEmFila.toFixed(2)) + " Kg <span class='kpi-subtitle'>(" + pecasEmFila + " unid)</span>");
+            inserirKpiSeguro('kpi-pendentes', Number(kgPendente.toFixed(2)) + " Kg <span class='kpi-subtitle'>(" + pecasPendente + " unid)</span>");
+            inserirKpiSeguro('kpi-concluido-final', Number(kgConcluido.toFixed(2)) + " Kg <span class='kpi-subtitle'>(" + pecasConcluido + " unid)</span>");
             
             // Injetar Nova Grelha de Categorias / Horas / Kg / Pol
-            document.getElementById('kpi-max-unid').innerText = `${unidMaxima} Unid`;
-            document.getElementById('kpi-max-detalhes').innerText = `⚖️ ${Number(kgMaxima.toFixed(2))} Kg | 📏 ${Number(polMaxima.toFixed(2))}"`;
-            document.getElementById('kpi-max-horas').innerText = `⏱️ ${Number(horasMaxima.toFixed(2))} Horas`;
+            inserirKpiSeguro('kpi-max-unid', `${unidMaxima} Unid`);
+            inserirKpiSeguro('kpi-max-detalhes', `⚖️ ${Number(kgMaxima.toFixed(2))} Kg | 📏 ${Number(polMaxima.toFixed(2))}"`);
+            inserirKpiSeguro('kpi-max-horas', `⏱️ ${Number(horasMaxima.toFixed(2))} Horas`);
             
-            document.getElementById('kpi-req-interna').innerText = `${unidLaranja} Unid`;
-            document.getElementById('kpi-req-interna-detalhes').innerText = `⚖️ ${Number(kgLaranja.toFixed(2))} Kg | 📏 ${Number(polLaranja.toFixed(2))}"`;
-            document.getElementById('kpi-req-interna-horas').innerText = `⏱️ ${Number(horasLaranja.toFixed(2))} Horas`;
+            inserirKpiSeguro('kpi-req-interna', `${unidLaranja} Unid`);
+            inserirKpiSeguro('kpi-req-interna-detalhes', `⚖️ ${Number(kgLaranja.toFixed(2))} Kg | 📏 ${Number(polLaranja.toFixed(2))}"`);
+            inserirKpiSeguro('kpi-req-interna-horas', `⏱️ ${Number(horasLaranja.toFixed(2))} Horas`);
             
-            document.getElementById('kpi-pintura-unid').innerText = `${unidAmarelo} Unid`;
-            document.getElementById('kpi-pintura-detalhes').innerText = `⚖️ ${Number(kgAmarelo.toFixed(2))} Kg | 📏 ${Number(polAmarelo.toFixed(2))}"`;
-            document.getElementById('kpi-pintura-horas').innerText = `⏱️ ${Number(horasAmarelo.toFixed(2))} Horas`;
+            inserirKpiSeguro('kpi-pintura-unid', `${unidAmarelo} Unid`);
+            inserirKpiSeguro('kpi-pintura-detalhes', `⚖️ ${Number(kgAmarelo.toFixed(2))} Kg | 📏 ${Number(polAmarelo.toFixed(2))}"`);
+            inserirKpiSeguro('kpi-pintura-horas', `⏱️ ${Number(horasAmarelo.toFixed(2))} Horas`);
             
-            document.getElementById('kpi-normal-unid').innerText = `${unidNormal} Unid`;
-            document.getElementById('kpi-normal-detalhes').innerText = `⚖️ ${Number(kgNormal.toFixed(2))} Kg | 📏 ${Number(polNormal.toFixed(2))}"`;
-            document.getElementById('kpi-normal-horas').innerText = `⏱️ ${Number(horasNormal.toFixed(2))} Horas`;
+            inserirKpiSeguro('kpi-normal-unid', `${unidNormal} Unid`);
+            inserirKpiSeguro('kpi-normal-detalhes', `⚖️ ${Number(kgNormal.toFixed(2))} Kg | 📏 ${Number(polNormal.toFixed(2))}"`);
+            inserirKpiSeguro('kpi-normal-horas', `⏱️ ${Number(horasNormal.toFixed(2))} Horas`);
             
-            document.getElementById('kpi-raiox-unid').innerText = `${unidRaiox} Unid`;
-            document.getElementById('kpi-raiox-detalhes').innerText = `⚖️ ${Number(kgRaiox.toFixed(2))} Kg | 📏 ${Number(polRaiox.toFixed(2))}"`;
-            document.getElementById('kpi-raiox-horas').innerText = `⏱️ ${Number(horasRaiox.toFixed(2))} Horas`;
+            inserirKpiSeguro('kpi-raiox-unid', `${unidRaiox} Unid`);
+            inserirKpiSeguro('kpi-raiox-detalhes', `⚖️ ${Number(kgRaiox.toFixed(2))} Kg | 📏 ${Number(polRaiox.toFixed(2))}"`);
+            inserirKpiSeguro('kpi-raiox-horas', `⏱️ ${Number(horasRaiox.toFixed(2))} Horas`);
             
-            const elRetrabalhoUnid = document.getElementById('kpi-retrabalho-unid');
-            const elRetrabalhoDetalhes = document.getElementById('kpi-retrabalho-detalhes');
-            const elRetrabalhoHoras = document.getElementById('kpi-retrabalho-horas');
-            if(elRetrabalhoUnid) elRetrabalhoUnid.innerText = `${unidRetrabalhoCat} Unid`;
-            if(elRetrabalhoDetalhes) elRetrabalhoDetalhes.innerText = `⚖️ ${Number(kgRetrabalhoCat.toFixed(2))} Kg | 📏 ${Number(polRetrabalhoCat.toFixed(2))}"`;
-            if(elRetrabalhoHoras) elRetrabalhoHoras.innerText = `⏱️ ${Number(horasRetrabalhoCat.toFixed(2))} Horas`;
+            inserirKpiSeguro('kpi-retrabalho-unid', `${unidRetrabalhoCat} Unid`);
+            inserirKpiSeguro('kpi-retrabalho-detalhes', `⚖️ ${Number(kgRetrabalhoCat.toFixed(2))} Kg | 📏 ${Number(polRetrabalhoCat.toFixed(2))}"`);
+            inserirKpiSeguro('kpi-retrabalho-horas', `⏱️ ${Number(horasRetrabalhoCat.toFixed(2))} Horas`);
         }
 
         // -----------------------------------------------------

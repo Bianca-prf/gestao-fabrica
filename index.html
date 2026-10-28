@@ -1041,6 +1041,15 @@
                                 <div class="zone-title">Pendente</div>
                                 <div class="column-content" data-board="main" data-fase="Pendente" data-setor="Serralheiros" data-operador="Neto"></div>
                             </div>
+                            <div class="worker-lane">
+                                <div class="worker-title">Tiago</div>
+                                <div class="zone-title" style="background:#e0e7ff; color:#3730a3;">Em Execução</div>
+                                <div class="column-content" data-board="main" data-fase="Produção" data-setor="Serralheiros" data-operador="Tiago"></div>
+                                <div class="zone-title">Em Fila</div>
+                                <div class="column-content" data-board="main" data-fase="Em Fila" data-setor="Serralheiros" data-operador="Tiago"></div>
+                                <div class="zone-title">Pendente</div>
+                                <div class="column-content" data-board="main" data-fase="Pendente" data-setor="Serralheiros" data-operador="Tiago"></div>
+                            </div>
                             <div class="sector-done-lane">
                                 <div class="worker-title">✅ Concluído</div>
                                 <div class="column-content" data-board="main" data-fase="Concluído Setor" data-setor="Serralheiros" data-operador="Qualquer"></div>
@@ -1899,7 +1908,7 @@
         // -----------------------------------------------------
         // NOVO MÓDULO: BRIEFING DIÁRIO
         // -----------------------------------------------------
-        const trabalhadoresBriefing = ['Camila', 'José Henriques', 'Suellen', 'Oleh', 'Yaroslav', 'Luís Agostinho', 'Diogo Santos', 'Jorge Vieira', 'Pedro Santos', 'André', 'Alexandre', 'Jenifer', 'Neto', 'Igor', 'Douglas', 'Davi'];
+        const trabalhadoresBriefing = ['Camila', 'José Henriques', 'Suellen', 'Oleh', 'Yaroslav', 'Luís Agostinho', 'Diogo Santos', 'Jorge Vieira', 'Pedro Santos', 'André', 'Alexandre', 'Jenifer', 'Neto', 'Tiago', 'Igor', 'Douglas', 'Davi'];
 
         function carregarBriefing() {
             const tbody = document.getElementById('briefing-tbody');
@@ -2396,7 +2405,7 @@
                                 }
                                 refsSet.add(idUnico);
 
-                                const equipa = ['suellen', 'josé', 'jose', 'jenifer', 'douglas', 'neto', 'alexandre', 'jorge', 'diogo', 'yaroslav', 'oleh', 'camila', 'ismael', 'igor', 'luís', 'luis'];
+                                const equipa = ['suellen', 'josé', 'jose', 'jenifer', 'douglas', 'neto', 'tiago', 'alexandre', 'jorge', 'diogo', 'yaroslav', 'oleh', 'camila', 'ismael', 'igor', 'luís', 'luis'];
                                 for (let t of equipa) {
                                     if (linhaStr.toLowerCase().includes(t)) { 
                                         trab = t.charAt(0).toUpperCase() + t.slice(1); 
@@ -3050,7 +3059,7 @@
             
             let taxaRetrabalho = pecasConcluido > 0 ? ((retrabalhosConcluidos / pecasConcluido) * 100).toFixed(1) : 0;
 
-            // Injetar KPIs Gerais
+            // Injetar KPIs Gerais na página (Usando a função segura que evita bloqueios)
             inserirKpiSeguro('kpi-retrabalho-geral', `${totalRetrabalhos} Unid <span class="kpi-subtitle">(${Number(taxaRetrabalho)}% Taxa Final)</span>`);
             inserirKpiSeguro('kpi-tons-ano', Number(totalKgAno.toFixed(2)) + " Kg");
             inserirKpiSeguro('kpi-em-execucao', Number(kgEmExecucao.toFixed(2)) + " Kg <span class='kpi-subtitle'>(" + pecasEmExecucao + " unid)</span>");

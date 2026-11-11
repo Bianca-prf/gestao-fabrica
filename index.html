@@ -925,6 +925,8 @@
         </div>
 
         <div class="add-form" id="admin-add-form">
+            <!-- Novo Campo da Obra Adicionado -->
+            <input type="text" id="new-obra" placeholder="Obra (Ex: HY25000)" style="width: 130px;">
             <input type="text" id="new-ref" placeholder="Nome/Referência" style="width: 160px;">
             <input type="number" id="new-kg" placeholder="Kg" step="any" style="width: 70px;">
             <input type="number" id="new-pol" placeholder="Pol ('')" step="any" style="width: 70px;">
@@ -947,6 +949,9 @@
             </label>
         </div>
 
+        <!-- NOVO: Bloco de notas de escrita livre que guarda no browser -->
+        <textarea id="free-text-board" class="briefing-header-notes" rows="2" placeholder="📝 Bloco de Notas Livre da Produção (o que escreveres aqui fica guardado mesmo que feches a página)..." oninput="localStorage.setItem('prf_notas_kanban', this.value)" style="margin-bottom: 10px; resize: vertical; border-color: var(--prf-blue);"></textarea>
+
         <div class="top-scroll-wrapper" id="topScrollWrapper">
             <div class="top-scroll-dummy" id="topScrollDummy"></div>
         </div>
@@ -964,8 +969,9 @@
             </div>
             
             <div class="column" style="min-width: 200px; width: 200px;">
-                <div class="column-header">Material (Camila)</div>
-                <div class="column-content" data-board="main" data-fase="Material" data-operador="Camila"></div>
+                <!-- Camila removida do título -->
+                <div class="column-header">Material</div>
+                <div class="column-content" data-board="main" data-fase="Material"></div>
             </div>
 
             <div class="column" style="min-width: 200px; width: 200px; border: 2px solid #ef5350;">
@@ -1004,6 +1010,16 @@
                                 <div class="zone-title">Pendente</div>
                                 <div class="column-content" data-board="main" data-fase="Pendente" data-setor="Tubistas" data-operador="José"></div>
                             </div>
+                            <!-- Neto transferido para Tubistas -->
+                            <div class="worker-lane">
+                                <div class="worker-title">Neto</div>
+                                <div class="zone-title" style="background:#e0e7ff; color:#3730a3;">Em Execução</div>
+                                <div class="column-content" data-board="main" data-fase="Produção" data-setor="Tubistas" data-operador="Neto"></div>
+                                <div class="zone-title">Em Fila</div>
+                                <div class="column-content" data-board="main" data-fase="Em Fila" data-setor="Tubistas" data-operador="Neto"></div>
+                                <div class="zone-title">Pendente</div>
+                                <div class="column-content" data-board="main" data-fase="Pendente" data-setor="Tubistas" data-operador="Neto"></div>
+                            </div>
                             <div class="sector-done-lane">
                                 <div class="worker-title">✅ Concluído</div>
                                 <div class="column-content" data-board="main" data-fase="Concluído Setor" data-setor="Tubistas" data-operador="Qualquer"></div>
@@ -1033,15 +1049,6 @@
                                 <div class="column-content" data-board="main" data-fase="Pendente" data-setor="Serralheiros" data-operador="Douglas"></div>
                             </div>
                             <div class="worker-lane">
-                                <div class="worker-title">Neto</div>
-                                <div class="zone-title" style="background:#e0e7ff; color:#3730a3;">Em Execução</div>
-                                <div class="column-content" data-board="main" data-fase="Produção" data-setor="Serralheiros" data-operador="Neto"></div>
-                                <div class="zone-title">Em Fila</div>
-                                <div class="column-content" data-board="main" data-fase="Em Fila" data-setor="Serralheiros" data-operador="Neto"></div>
-                                <div class="zone-title">Pendente</div>
-                                <div class="column-content" data-board="main" data-fase="Pendente" data-setor="Serralheiros" data-operador="Neto"></div>
-                            </div>
-                            <div class="worker-lane">
                                 <div class="worker-title">Tiago</div>
                                 <div class="zone-title" style="background:#e0e7ff; color:#3730a3;">Em Execução</div>
                                 <div class="column-content" data-board="main" data-fase="Produção" data-setor="Serralheiros" data-operador="Tiago"></div>
@@ -1049,6 +1056,16 @@
                                 <div class="column-content" data-board="main" data-fase="Em Fila" data-setor="Serralheiros" data-operador="Tiago"></div>
                                 <div class="zone-title">Pendente</div>
                                 <div class="column-content" data-board="main" data-fase="Pendente" data-setor="Serralheiros" data-operador="Tiago"></div>
+                            </div>
+                            <!-- Oleh transferido para Serralheiros -->
+                            <div class="worker-lane">
+                                <div class="worker-title">Oleh</div>
+                                <div class="zone-title" style="background:#e0e7ff; color:#3730a3;">Em Execução</div>
+                                <div class="column-content" data-board="main" data-fase="Produção" data-setor="Serralheiros" data-operador="Oleh"></div>
+                                <div class="zone-title">Em Fila</div>
+                                <div class="column-content" data-board="main" data-fase="Em Fila" data-setor="Serralheiros" data-operador="Oleh"></div>
+                                <div class="zone-title">Pendente</div>
+                                <div class="column-content" data-board="main" data-fase="Pendente" data-setor="Serralheiros" data-operador="Oleh"></div>
                             </div>
                             <div class="sector-done-lane">
                                 <div class="worker-title">✅ Concluído</div>
@@ -1060,6 +1077,16 @@
                     <div class="sub-sector">
                         <div class="sub-sector-title">🔥 SOLDADORES</div>
                         <div class="sub-sector-grid">
+                            <!-- Aline adicionada aos Soldadores -->
+                            <div class="worker-lane">
+                                <div class="worker-title">Aline</div>
+                                <div class="zone-title" style="background:#e0e7ff; color:#3730a3;">Em Execução</div>
+                                <div class="column-content" data-board="main" data-fase="Produção" data-setor="Soldadores" data-operador="Aline"></div>
+                                <div class="zone-title">Em Fila</div>
+                                <div class="column-content" data-board="main" data-fase="Em Fila" data-setor="Soldadores" data-operador="Aline"></div>
+                                <div class="zone-title">Pendente</div>
+                                <div class="column-content" data-board="main" data-fase="Pendente" data-setor="Soldadores" data-operador="Aline"></div>
+                            </div>
                             <div class="worker-lane">
                                 <div class="worker-title">Alexandre</div>
                                 <div class="zone-title" style="background:#e0e7ff; color:#3730a3;">Em Execução</div>
@@ -1115,14 +1142,15 @@
                     <div class="sub-sector">
                         <div class="sub-sector-title">🤖 ORBITAL</div>
                         <div class="sub-sector-grid">
+                            <!-- Máquina sem nome agregado -->
                             <div class="worker-lane">
-                                <div class="worker-title">Oleh</div>
+                                <div class="worker-title">Máquina</div>
                                 <div class="zone-title" style="background:#e0e7ff; color:#3730a3;">Em Execução</div>
-                                <div class="column-content" data-board="main" data-fase="Produção" data-setor="Orbital" data-operador="Oleh"></div>
+                                <div class="column-content" data-board="main" data-fase="Produção" data-setor="Orbital" data-operador="Não Atribuído"></div>
                                 <div class="zone-title">Em Fila</div>
-                                <div class="column-content" data-board="main" data-fase="Em Fila" data-setor="Orbital" data-operador="Oleh"></div>
+                                <div class="column-content" data-board="main" data-fase="Em Fila" data-setor="Orbital" data-operador="Não Atribuído"></div>
                                 <div class="zone-title">Pendente</div>
-                                <div class="column-content" data-board="main" data-fase="Pendente" data-setor="Orbital" data-operador="Oleh"></div>
+                                <div class="column-content" data-board="main" data-fase="Pendente" data-setor="Orbital" data-operador="Não Atribuído"></div>
                             </div>
                             <div class="sector-done-lane">
                                 <div class="worker-title">✅ Concluído</div>
@@ -1719,6 +1747,15 @@
             return `${h}h${m < 10 ? '0' : ''}${m}`;
         }
 
+        // Restaurar as notas livres gravadas no computador
+        document.addEventListener('DOMContentLoaded', () => {
+            const notas = localStorage.getItem('prf_notas_kanban');
+            if (notas) {
+                const textEl = document.getElementById('free-text-board');
+                if (textEl) textEl.value = notas;
+            }
+        });
+
         // =====================================================
         // LIGAÇÃO SUPABASE
         // =====================================================
@@ -1794,6 +1831,9 @@
                 
                 const notes = document.getElementById('briefing-notes');
                 if(notes) notes.setAttribute('readonly', 'true');
+                
+                const freeText = document.getElementById('free-text-board');
+                if(freeText) freeText.setAttribute('readonly', 'true');
             }
         }
 
@@ -1908,7 +1948,7 @@
         // -----------------------------------------------------
         // NOVO MÓDULO: BRIEFING DIÁRIO
         // -----------------------------------------------------
-        const trabalhadoresBriefing = ['Camila', 'José Henriques', 'Suellen', 'Oleh', 'Yaroslav', 'Luís Agostinho', 'Diogo Santos', 'Jorge Vieira', 'Pedro Santos', 'André', 'Alexandre', 'Jenifer', 'Neto', 'Tiago', 'Igor', 'Douglas', 'Davi'];
+        const trabalhadoresBriefing = ['José Henriques', 'Suellen', 'Yaroslav', 'Luís Agostinho', 'Diogo Santos', 'Jorge Vieira', 'Pedro Santos', 'André', 'Alexandre', 'Aline', 'Jenifer', 'Oleh', 'Neto', 'Tiago', 'Igor', 'Douglas', 'Davi'];
 
         function carregarBriefing() {
             const tbody = document.getElementById('briefing-tbody');
@@ -2194,6 +2234,7 @@
         }
 
         async function executarAdicionarObra(dataCriacaoStr) {
+            const obraForm = document.getElementById('new-obra').value.trim() || 'MANUAL';
             const ref = document.getElementById('new-ref').value.trim(); 
             const prio = document.getElementById('new-prio').value;
             const vKg = parseNumeroSeguro('new-kg');
@@ -2202,7 +2243,7 @@
             const mat = document.getElementById('new-material').value.trim();
 
             const insertData = { 
-                obra_ref: 'MANUAL', 
+                obra_ref: sanitizeForDB(obraForm), 
                 referencia: sanitizeForDB(ref), 
                 kg: vKg, 
                 toneladas: vKg, 
@@ -2236,6 +2277,7 @@
             }
 
             if (res.data && res.data.length > 0) {
+                document.getElementById('new-obra').value = ''; 
                 document.getElementById('new-ref').value = ''; 
                 document.getElementById('new-kg').value = ''; 
                 document.getElementById('new-pol').value = '';
@@ -2405,7 +2447,7 @@
                                 }
                                 refsSet.add(idUnico);
 
-                                const equipa = ['suellen', 'josé', 'jose', 'jenifer', 'douglas', 'neto', 'tiago', 'alexandre', 'jorge', 'diogo', 'yaroslav', 'oleh', 'camila', 'ismael', 'igor', 'luís', 'luis'];
+                                const equipa = ['suellen', 'josé', 'jose', 'jenifer', 'douglas', 'neto', 'tiago', 'alexandre', 'aline', 'jorge', 'diogo', 'yaroslav', 'oleh', 'ismael', 'igor', 'luís', 'luis'];
                                 for (let t of equipa) {
                                     if (linhaStr.toLowerCase().includes(t)) { 
                                         trab = t.charAt(0).toUpperCase() + t.slice(1); 
